@@ -197,13 +197,13 @@ class spell_mage_summon_water_elemental : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-				Pet* WaterElemental = GetCaster()->ToPlayer()->GetPet();
+                Pet* WaterElemental = GetCaster()->ToPlayer()->GetPet();
                 Unit* caster = GetCaster()->ToPlayer();
 
-				// UnSummon previous pet before summoning new one
-				// in case because of duel reset script
-				if (WaterElemental)
-					WaterElemental->UnSummon();
+                // UnSummon previous pet before summoning new one
+                // in case because of duel reset script
+                if (WaterElemental)
+                    WaterElemental->UnSummon();
 
                 // Glyph of Eternal Water
                 if (caster->HasAura(SPELL_MAGE_GLYPH_OF_ETERNAL_WATER))
@@ -355,24 +355,24 @@ class spell_mage_ice_block : public SpellScriptLoader
 {	
     public:	
         spell_mage_ice_block() : SpellScriptLoader("spell_mage_ice_block") { }	
-	
+    
         class spell_mage_ice_block_SpellScript : public SpellScript	
         {	
             PrepareSpellScript(spell_mage_ice_block_SpellScript);	
-	
+    
             SpellCastResult CheckCast()	
             {	
                 if (GetCaster()->HasAura(33786))	
                     return SPELL_FAILED_STUNNED;	
                 return SPELL_CAST_OK;	
             }	
-	
+    
             void Register()	
             {	
                 OnCheckCast += SpellCheckCastFn(spell_mage_ice_block_SpellScript::CheckCast);	
             }	
         };	
-	
+    
         SpellScript* GetSpellScript() const	
         {	
             return new spell_mage_ice_block_SpellScript();	
@@ -388,5 +388,5 @@ void AddSC_mage_spell_scripts()
     new spell_mage_incanters_absorbtion_manashield();
     new spell_mage_polymorph_cast_visual();
     new spell_mage_summon_water_elemental();
-	new spell_mage_ice_block();
+    new spell_mage_ice_block();
 }
