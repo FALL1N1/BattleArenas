@@ -98,7 +98,7 @@ class spell_dk_anti_magic_shell_self : public SpellScriptLoader
             bool Load()
             {
                 absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
-				if (GetCaster()->HasSpell(49224))
+                if (GetCaster()->HasSpell(49224))
                     absorbPct += 8;
                 if (GetCaster()->HasSpell(49610))
                     absorbPct += 16;
@@ -783,18 +783,18 @@ public:
         {
             if (Player* caster = GetCaster()->ToPlayer())
             {
-				// Death Grip should not be castable while jumping/falling
+                // Death Grip should not be castable while jumping/falling
                 if (caster->HasUnitState(UNIT_STATE_JUMPING) || caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
                     return SPELL_FAILED_MOVING;
 
-			    float x = GetTargetUnit()->GetPositionX();
-				float y = GetTargetUnit()->GetPositionY();
-				float z = GetTargetUnit()->GetPositionZ();
+                float x = GetTargetUnit()->GetPositionX();
+                float y = GetTargetUnit()->GetPositionY();
+                float z = GetTargetUnit()->GetPositionZ();
 
-				// Death Grip's minimum range set to 8 yards
-				if (GetTargetUnit()->GetTypeId() == TYPEID_PLAYER)
-				    if (caster->GetDistance(x, y, z) < 8)
-					    return SPELL_FAILED_TOO_CLOSE;
+                // Death Grip's minimum range set to 8 yards
+                if (GetTargetUnit()->GetTypeId() == TYPEID_PLAYER)
+                    if (caster->GetDistance(x, y, z) < 8)
+                        return SPELL_FAILED_TOO_CLOSE;
             }
             return SPELL_CAST_OK;
         }
@@ -829,10 +829,10 @@ class spell_dk_death_grip : public SpellScriptLoader
                 if (Unit* target = GetHitUnit())
                 {
                     if (!target->HasAuraType(SPELL_AURA_DEFLECT_SPELLS)) // Deterrence
-					{
+                    {
                         target->CastSpell(pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), damage, true);
-						target->CastStop();
-					}
+                        target->CastStop();
+                    }
                 }
             }
 
@@ -866,6 +866,6 @@ void AddSC_deathknight_spell_scripts()
     new spell_dk_improved_unholy_presence();
     new spell_dk_death_strike();
     new spell_dk_death_coil();
-	new spell_dk_death_grip_initial();
+    new spell_dk_death_grip_initial();
     new spell_dk_death_grip();
 }
