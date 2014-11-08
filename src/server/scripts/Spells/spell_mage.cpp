@@ -195,28 +195,28 @@ class spell_mage_summon_water_elemental : public SpellScriptLoader
                 return true;
             }
 
-            void HandleDummy(SpellEffIndex /*effIndex*/)
-            {
-                Pet* WaterElemental = GetCaster()->ToPlayer()->GetPet();
-                Unit* caster = GetCaster()->ToPlayer();
+			void HandleDummy(SpellEffIndex /*effIndex*/)
+			{
+				Unit* caster = GetCaster()->ToPlayer();
+				Guardian* elemental = caster->GetGuardianPet();
 
-                // UnSummon previous pet before summoning new one
-                // in case because of duel reset script
-                if (WaterElemental)
-                    WaterElemental->UnSummon();
+				// UnSummon previous pet before summoning new one
+				// in case because of duel reset script
+				if (elemental)
+					elemental->UnSummon();
 
-                // Glyph of Eternal Water
-                if (caster->HasAura(SPELL_MAGE_GLYPH_OF_ETERNAL_WATER))
-                    caster->CastSpell(caster, SPELL_MAGE_SUMMON_WATER_ELEMENTAL_PERMANENT, true);
-                else
-                    caster->CastSpell(caster, SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY, true);
-            }
+				// Glyph of Eternal Water
+				if (caster->HasAura(SPELL_MAGE_GLYPH_OF_ETERNAL_WATER))
+					caster->CastSpell(caster, SPELL_MAGE_SUMMON_WATER_ELEMENTAL_PERMANENT, true);
+				else
+					caster->CastSpell(caster, SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY, true);
+			}
 
-            void Register()
-            {
-                // add dummy effect spell handler to Summon Water Elemental
-                OnEffectHit += SpellEffectFn(spell_mage_summon_water_elemental_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
+			void Register()
+			{
+				// add dummy effect spell handler to Summon Water Elemental
+				OnEffectHit += SpellEffectFn(spell_mage_summon_water_elemental_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+			}
         };
 
         SpellScript* GetSpellScript() const
