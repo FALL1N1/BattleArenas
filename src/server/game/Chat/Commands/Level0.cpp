@@ -92,7 +92,7 @@ bool ChatHandler::HandleServerInfoCommand(const char* /*args*/)
     std::string uptime = secsToTimeString(sWorld->GetUptime());
     uint32 updateTime = sWorld->GetUpdateTime();
 
-	PSendSysMessage("BACore Custom Rev: WIN320426-27OCT2014 (RelWithDebInfo)");
+	PSendSysMessage("BACore Custom Rev: WIN320426-08-NOV-2014 ( "_FULLVERSION")");
     PSendSysMessage("Developed by Natureknight");
 
 	// Select also the fake players and display the info

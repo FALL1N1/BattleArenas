@@ -57,6 +57,9 @@ if( UNIX )
   find_package(BZip2)
 endif()
 
+# Increases the 'Precompiled Header Memory Allocation Limit' to 150MB
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zm250")
+
 # Find revision ID and hash of the sourcetree
 include(cmake/genrev.cmake)
 
