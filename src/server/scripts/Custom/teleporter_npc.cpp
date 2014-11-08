@@ -28,48 +28,34 @@ class Teleporter_NPC : public CreatureScript
 			case ALLIANCE:
 				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Stormwind - Mall", GOSSIP_SENDER_MAIN, 2, "Are you sure you want to go to Stormwind Mall?", 0, false);
 				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Ironforge - Mall", GOSSIP_SENDER_MAIN, 9, "Are you sure you want to go to Ironforge Mall?", 0, false);
-				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Goldenmist Village - PvP |cffD80000NEW!|r", GOSSIP_SENDER_MAIN, 43, "Are you sure you want to go to Goldenmist Village?", 0, false);
+				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Goldenmist Village - PvP", GOSSIP_SENDER_MAIN, 43, "Are you sure you want to go to Goldenmist Village?", 0, false);
+				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Elwynn Forest", GOSSIP_SENDER_MAIN, 47, "Are you sure you want to go to Elwynn Forest?", 0, false);
+				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Raid for Orgrimmar", GOSSIP_SENDER_MAIN, 49, "Are you sure you want to go to Durotar? (Need atleast 3 players)", 0, false);
 				break;
 			case HORDE:
 				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Orgrimmar - Mall", GOSSIP_SENDER_MAIN, 4, "Are you sure you want to go to Orgrimmar Mall?", 0, false);
 				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Silvermoon - Mall", GOSSIP_SENDER_MAIN, 3, "Are you sure you want to go to Silvermoon Mall?", 0, false);
-				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Goldenmist Village - PvP |cffD80000NEW!|r", GOSSIP_SENDER_MAIN, 44, "Are you sure you want to go to Goldenmist Village?", 0, false);
+				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Goldenmist Village - PvP", GOSSIP_SENDER_MAIN, 44, "Are you sure you want to go to Goldenmist Village?", 0, false);
+				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Durotar", GOSSIP_SENDER_MAIN, 48, "Are you sure you want to go to Durotar?", 0, false);
+				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Raid for Stormwind", GOSSIP_SENDER_MAIN, 50, "Are you sure you want to go to Durotar? (Need atleast 3 players)", 0, false);
 				break;
 			}
-			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Stranglethorn Vale", GOSSIP_SENDER_MAIN, 17, "Are you sure you want to go to Stranglethorn Vale?", 0, false);
-			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Dueling Zone |cffD80000NEW!|r", GOSSIP_SENDER_MAIN, 45, "Are you sure you want to go to Dueling Zone?", 0, false);
-			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Zone: Nagrand Arena |cffD80000NEW!|r", GOSSIP_SENDER_MAIN, 46, "Are you sure you want to go to Nagrand Arena?", 0, false);
+
+			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Stranglethorn Vale", GOSSIP_SENDER_MAIN, 17, "Are you sure you want to go to Stranglethorn Vale?", 0, false);
+			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Dueling Zone", GOSSIP_SENDER_MAIN, 45, "Are you sure you want to go to Dueling Zone?", 0, false);
+			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Zone: Nagrand Arena", GOSSIP_SENDER_MAIN, 46, "Are you sure you want to go to Nagrand Arena?", 0, false);
 			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Transmogrification Place", GOSSIP_SENDER_MAIN, 18, "Are you sure you want to go to Transmogrification Place?", 0, false);
 			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Professions Place", GOSSIP_SENDER_MAIN, 5, "Are you sure you want to go to Professions Mall?", 0, false);
 			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Tanaris - Custom Jump Event", GOSSIP_SENDER_MAIN, 7, "Are you sure you want to go to Custom jump event?", 0, false);
-			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Random Queue Places |cffD80000NEW!|r", GOSSIP_SENDER_MAIN, 16, "Are you sure you want to do this?", 0, false);
-			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Random Queue Places (As Group) |cffD80000NEW!|r", GOSSIP_SENDER_MAIN, 8, "Are you sure you want to do this?", 0, false);
+			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Random Queue Places", GOSSIP_SENDER_MAIN, 16, "Are you sure you want to do this?", 0, false);
+			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Random Queue Places (As Group)", GOSSIP_SENDER_MAIN, 8, "Are you sure you want to do this?", 0, false);
 			if (pPlayer->getClass() == CLASS_HUNTER)
 				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Hunter's Tame Pet Zone", GOSSIP_SENDER_MAIN, 19, "Are you sure you want to go to pets zone?", 0, false);
 			else if (pPlayer->getClass() != CLASS_HUNTER)
 				pPlayer->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Hunter's Tame Pet Zone", GOSSIP_SENDER_MAIN, 42, "Are you sure you want to go to pets zone?", 0, false);
-			pPlayer->ADD_GOSSIP_ITEM(4, "Additional Features |cffD80000NEW!|r", GOSSIP_SENDER_MAIN, 20);
+			pPlayer->ADD_GOSSIP_ITEM(4, "Additional Features", GOSSIP_SENDER_MAIN, 20);
 			pPlayer->SEND_GOSSIP_MENU(60020, pCreature->GetGUID());
 			return true;
-
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "ICC Dungeons (Coming Soon)\n", GOSSIP_SENDER_MAIN, 33, "Are you sure you want to go to ICC dungeons place?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Darnassus (Mall)", GOSSIP_SENDER_MAIN, 1, "Are you sure you want to go to Darnassus Mall?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Desolace - Mall", GOSSIP_SENDER_MAIN, 10, "Are you sure you want to go to Desolace?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Alcaz Island - World PVP", GOSSIP_SENDER_MAIN, 17, "Are you sure you want to go to Gurubashi Arena?", 0, false);
-
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Orgrimmar - Mall", GOSSIP_SENDER_MAIN, 4, "Are you sure you want to go to Orgrimmar?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Silvermoon - Mall", GOSSIP_SENDER_MAIN, 3, "Are you sure you want to go to Silvermoon?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Thunder Bluff - Mall", GOSSIP_SENDER_MAIN, 11, "Are you sure you want to go to Thunder Bluff?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Undercity - Mall", GOSSIP_SENDER_MAIN, 12, "Are you sure you want to go to Undercity?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Alcaz Island - World PVP", GOSSIP_SENDER_MAIN, 32, "Are you sure you want to go to Alcaz Island?", 0, false);
-
-			// Default options for both factions
-
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Stranglethorn Vale - World PvP Zone", GOSSIP_SENDER_MAIN, 17, "Are you sure you want to go to Gurubashi Arena?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Transmogrification - Mall", GOSSIP_SENDER_MAIN, 18, "Are you sure you want to go to Transmogrification Place?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Dueling Zone", GOSSIP_SENDER_MAIN, 6, "Are you sure you want to go to Dueling zone?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Profession Place", GOSSIP_SENDER_MAIN, 5, "Are you sure you want to go to Professions mall?", 0, false);
-			//return true;
 		}
 
 		bool OnGossipSelect(Player * pPlayer, Creature * pCreature, uint32 sender, uint32 uiAction)
@@ -601,6 +587,98 @@ class Teleporter_NPC : public CreatureScript
 
 				case 46: // Nagrand Arena
 					pPlayer->TeleportTo(530,  -2104.031982f,  6564.698730f, 5.153860f, 3.481085f);
+					break;
+
+				case 47: // Elwynn Forest
+					pPlayer->TeleportTo(0, -9103.945313f, 407.655640f, 92.646919f, 3.781690f);
+					break;
+
+				case 49: // Raid for Orgrimmar
+					{
+						if (!group) // If the player isn't in a group, then...
+                        {
+						    pPlayer->GetSession()->SendAreaTriggerMessage("You are not in group!");
+			                pPlayer->CLOSE_GOSSIP_MENU();
+		                    return false;
+                        }
+
+						pPlayer->TeleportTo(1,  1014.313416f,  -4449.859375f, 11.343950f, 0.458436f);
+					    for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                        {
+
+                             Player * plr = itr->getSource();
+ 
+                             if (!plr || !plr->GetSession())
+                                 continue;
+ 
+                             if (plr->GetGUID() == pPlayer->GetGUID())
+                                 continue;
+ 
+                             if (plr->IsBeingTeleported()) // If is being teleported..
+                                 continue;
+ 
+                             if (plr->isInFlight()) // Is the player in flight?
+                             {
+                                 plr->GetMotionMaster()->MovementExpired();
+                                 plr->CleanupAfterTaxiFlight();
+                             }
+                             else
+                                 plr->SaveRecallPosition();
+                                                                                             
+                             plr->SetSummonPoint(1,  1014.313416f,  -4449.859375f, 11.343950f);
+                             WorldPacket data(SMSG_SUMMON_REQUEST, 8+4+4);
+                             data << uint64(pPlayer->GetGUID());                                       // summoner guid
+                             data << uint32(14);                                                       // summoner zone
+                             data << uint32(MAX_PLAYER_SUMMON_DELAY*IN_MILLISECONDS);                  // auto decline after msecs
+                             plr->GetSession()->SendPacket(&data);
+                        }
+					}
+					break;
+
+				case 48: // Durotar
+					pPlayer->TeleportTo(1, 1359.506348f, -4369.427246f, 26.164385f, 3.450796f);
+					break;
+
+				case 50: // Raid for Stormwind
+					{
+						if (!group) // If the player isn't in a group, then...
+                        {
+							pPlayer->GetSession()->SendAreaTriggerMessage("You are not in group!");
+			                pPlayer->CLOSE_GOSSIP_MENU();
+		                    return false;
+                        }
+
+						pPlayer->TeleportTo(0,  -9459.583984f,  63.895885f, 55.876137f, 0.485727f);
+					    for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                        {
+
+                             Player * plr = itr->getSource();
+ 
+                             if (!plr || !plr->GetSession())
+                                 continue;
+ 
+                             if (plr->GetGUID() == pPlayer->GetGUID())
+                                 continue;
+ 
+                             if (plr->IsBeingTeleported()) // If is being teleported..
+                                 continue;
+ 
+                             if (plr->isInFlight()) // Is the player in flight?
+                             {
+                                 plr->GetMotionMaster()->MovementExpired();
+                                 plr->CleanupAfterTaxiFlight();
+                             }
+                             else
+                                 plr->SaveRecallPosition();
+                                                                                             
+                             plr->SetSummonPoint(0,  -9459.583984f,  63.895885f, 55.876137f);
+                             WorldPacket data(SMSG_SUMMON_REQUEST, 8+4+4);
+                             data << uint64(pPlayer->GetGUID());                                       // summoner guid
+                             data << uint32(12);                                                       // summoner zone
+                             data << uint32(MAX_PLAYER_SUMMON_DELAY*IN_MILLISECONDS);                  // auto decline after msecs
+                             plr->GetSession()->SendPacket(&data);
+                        }
+					}
 					break;
 			}
 		    return true;
