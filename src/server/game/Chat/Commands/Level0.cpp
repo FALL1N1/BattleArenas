@@ -83,7 +83,7 @@ bool ChatHandler::HandleStartCommand(const char* /*args*/)
 
 bool ChatHandler::HandleServerInfoCommand(const char* /*args*/)
 {
-	uint32 playersNum = sWorld->GetPlayerCount();
+    uint32 playersNum = sWorld->GetPlayerCount();
     uint32 maxPlayersNum = sWorld->GetMaxPlayerCount();
     uint32 activeClientsNum = sWorld->GetActiveSessionCount();
     uint32 queuedClientsNum = sWorld->GetQueuedSessionCount();
@@ -92,29 +92,29 @@ bool ChatHandler::HandleServerInfoCommand(const char* /*args*/)
     std::string uptime = secsToTimeString(sWorld->GetUptime());
     uint32 updateTime = sWorld->GetUpdateTime();
 
-	PSendSysMessage("BACore Custom Rev: WIN320426-08-NOV-2014 ( "_FULLVERSION")");
+    PSendSysMessage("BACore Custom Rev: WIN320426-08-NOV-2014 ( "_FULLVERSION")");
     PSendSysMessage("Developed by Natureknight");
 
-	// Select also the fake players and display the info
-	if (sWorld->getBoolConfig(CONFIG_FAKE_WHO_LIST))
-	{
-	    QueryResult selectFakePlayers = CharacterDatabase.PQuery("SELECT COUNT(*) FROM characters WHERE online = '2';");
+    // Select also the fake players and display the info
+    if (sWorld->getBoolConfig(CONFIG_FAKE_WHO_LIST))
+    {
+        QueryResult selectFakePlayers = CharacterDatabase.PQuery("SELECT COUNT(*) FROM characters WHERE online = '2';");
 
-	    if (!selectFakePlayers)
-		    return false;
+        if (!selectFakePlayers)
+            return false;
 
-	    Field* fields = selectFakePlayers->Fetch();
+        Field* fields = selectFakePlayers->Fetch();
         uint32 fakePlayers = fields[0].GetUInt32();
 
         PSendSysMessage(LANG_CONNECTED_PLAYERS, (playersNum + fakePlayers), (maxPlayersNum + fakePlayers));
         PSendSysMessage(LANG_CONNECTED_USERS, (activeClientsNum + fakePlayers), (maxActiveClientsNum + fakePlayers), queuedClientsNum, maxQueuedClientsNum);
-	}
-	else
-	{
+    }
+    else
+    {
         PSendSysMessage(LANG_CONNECTED_PLAYERS, playersNum, maxPlayersNum);
         PSendSysMessage(LANG_CONNECTED_USERS, activeClientsNum, maxActiveClientsNum, queuedClientsNum, maxQueuedClientsNum);
-	}
-	PSendSysMessage(LANG_UPTIME, uptime.c_str());
+    }
+    PSendSysMessage(LANG_UPTIME, uptime.c_str());
     PSendSysMessage(LANG_UPDATE_DIFF, updateTime);
     //! Can't use sWorld->ShutdownMsg here in case of console command
     if (sWorld->IsShuttingDown())
