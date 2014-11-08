@@ -42,8 +42,12 @@ set(scripts_STAT_SRCS
   Custom/TransmogMgr.cpp
   Custom/TransmogMgr.h
   Custom/cooldowns_crystal.cpp
-  Custom/solo_queue_npc/solo_queue_npc.cpp
-  Custom/solo_queue_npc/solo_queue_npc.h
+  Custom/template_npc_new/template_npc.cpp
+  Custom/template_npc_new/template_npc.h
+  Custom/template_npc_new/template_npc_commands.cpp
+  Custom/template_npc_new/template_npc_commands.h
+  Custom/npc_solo3v3.cpp
+  Custom/npc_solo3v3.h
 )
 
 message("  -> Prepared: Custom")

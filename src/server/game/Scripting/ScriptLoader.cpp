@@ -1245,7 +1245,7 @@ void AddBattlegroundScripts()
 	void AddSC_npc_enchantment();
 	void AddSC_Security_Scripts();
 	void AddSC_Beastmaster_NPC();
-	//void AddSC_npc_1v1arena();
+	void AddSC_npc_1v1arena();
 	void AddSC_Arena_Scripts();
 	void AddSC_mall_guide_horde();
 	void AddSC_mall_guide_alliance();
@@ -1254,7 +1254,6 @@ void AddBattlegroundScripts()
 	void AddSC_transmog();
 	void AddSC_StartUpTransmog();
 	void AddSC_CooldownsCrystal();
-	//void AddSC_solo_queue_npc();
 	void AddSC_template_npc();
 	void AddSC_createItemSet_commandscript();
 	void AddSC_npc_solo3v3();
@@ -1283,7 +1282,7 @@ void AddCustomScripts()
 	AddSC_npc_enchantment();
 	AddSC_Security_Scripts();
 	AddSC_Beastmaster_NPC();
-	//AddSC_npc_1v1arena();
+	AddSC_npc_1v1arena();
 	AddSC_Arena_Scripts();
 	AddSC_mall_guide_horde();
 	AddSC_mall_guide_alliance();
@@ -1292,7 +1291,6 @@ void AddCustomScripts()
 	AddSC_transmog();
 	AddSC_StartUpTransmog();
 	AddSC_CooldownsCrystal();
-	//AddSC_solo_queue_npc();
 	AddSC_template_npc();
 	AddSC_createItemSet_commandscript();
 	AddSC_npc_solo3v3();
