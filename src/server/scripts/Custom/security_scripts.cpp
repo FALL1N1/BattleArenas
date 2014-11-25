@@ -63,6 +63,16 @@ class gamemasters_security : public PlayerScript
 			    player->EquipNewItem(EQUIPMENT_SLOT_FEET, 11508, true);
 			    player->EquipNewItem(EQUIPMENT_SLOT_HEAD, 12064, true);
 			}
+
+			// Prevent players to log in with the same ip
+			SessionMap sessions = sWorld->GetAllSessions();
+			for (SessionMap::iterator itr = sessions.begin(); itr != sessions.end(); ++itr)
+				if (Player* plr = itr->second->GetPlayer())
+				{
+					if (plr != player) // Dont check adresses of same character (?)
+						if (plr->GetSession()->GetRemoteAddress() == player->GetSession()->GetRemoteAddress())
+							player->GetSession()->KickPlayer();
+				}
 		}
 };
 
