@@ -872,44 +872,47 @@ void Battleground::EndBattleground(uint32 winner)
 		// And Badge of Justice as reward from Solo Queue
 		if (team == winner && isArena())
 		{
-			// Don't reward leavers in arena preparation
-			if (player->HasAura(SPELL_ARENA_PREPARATION))
-				return;
-
 			if (isRated())
 			{
-				if (GetArenaType() == ARENA_TYPE_2v2)
-					player->AddItem(54218, 1);  // Add one BattleArenas Reward Box
-
-				if (GetArenaType() == ARENA_TYPE_3v3)
+				// Dont reward players in arena preparation
+				if (!player->HasAura(SPELL_ARENA_PREPARATION))
 				{
-					player->AddItem(54218, 1); // Add two BattleArenas Reward Box
+					if (GetArenaType() == ARENA_TYPE_2v2)
+						player->AddItem(54218, 1);  // Add one BattleArenas Reward Box
 
-					// Bonus rewards for Healers
-					if (Arena1v1CheckTalents(player) == false)
+					if (GetArenaType() == ARENA_TYPE_3v3)
+					{
 						player->AddItem(54218, 1); // Add two BattleArenas Reward Box
-				}
 
-				if (GetArenaType() == ARENA_TYPE_5v5) // 1v1 rated
-					player->AddItem(29434, 5); // Add 5 Badge of Justice
+						// Bonus rewards for Healers
+						if (Arena1v1CheckTalents(player) == false)
+							player->AddItem(54218, 1); // Add two BattleArenas Reward Box
+					}
 
-				if (GetArenaType() == ARENA_TYPE_3v3_SOLO)
-				{
-					player->AddItem(54218, 1); // Add one BattleArenas Reward Box
+					if (GetArenaType() == ARENA_TYPE_5v5) // 1v1 rated
+						player->AddItem(29434, 5); // Add 5 Badge of Justice
 
-					// Bonus rewards for Healers
-					if (Arena1v1CheckTalents(player) == false)
-						player->AddItem(54218, 1); // Add additional BattleArenas Reward Box
+					if (GetArenaType() == ARENA_TYPE_3v3_SOLO)
+					{
+						player->AddItem(54218, 1); // Add one BattleArenas Reward Box
+
+						// Bonus rewards for Healers
+						if (Arena1v1CheckTalents(player) == false)
+							player->AddItem(54218, 1); // Add additional BattleArenas Reward Box
+					}
 				}
 			}
 
 			if (IsChallenge())
 			{
-				player->AddItem(29434, 1); // Add 5 Badge of Justice from challenges
+				if (!player->HasAura(SPELL_ARENA_PREPARATION))
+				{
+					player->AddItem(29434, 1); // Add 5 Badge of Justice from challenges
 
-				// Bonus rewards for Healers
-				if (Arena1v1CheckTalents(player) == false)
-					player->AddItem(29434, 1); // Add additional BattleArenas Reward Box
+					// Bonus rewards for Healers
+					if (Arena1v1CheckTalents(player) == false)
+						player->AddItem(29434, 1); // Add additional Badge of Justice
+				}
 			}
 		}
 
