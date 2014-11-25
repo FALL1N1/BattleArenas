@@ -41,8 +41,8 @@ class Teleporter_NPC : public CreatureScript
                 break;
             }
 
-            //pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Stranglethorn Vale", GOSSIP_SENDER_MAIN, 17, "Are you sure you want to go to Stranglethorn Vale?", 0, false);
-            //pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Dueling Zone", GOSSIP_SENDER_MAIN, 45, "Are you sure you want to go to Dueling Zone?", 0, false);
+            pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Stranglethorn Vale", GOSSIP_SENDER_MAIN, 17, "Are you sure you want to go to Stranglethorn Vale?", 0, false);
+            pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Dueling Zone", GOSSIP_SENDER_MAIN, 45, "Are you sure you want to go to Dueling Zone?", 0, false);
             pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Zone: Nagrand Arena", GOSSIP_SENDER_MAIN, 46, "Are you sure you want to go to Nagrand Arena?", 0, false);
             pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Transmogrification Place", GOSSIP_SENDER_MAIN, 18, "Are you sure you want to go to Transmogrification Place?", 0, false);
             pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Professions Place", GOSSIP_SENDER_MAIN, 5, "Are you sure you want to go to Professions Mall?", 0, false);
