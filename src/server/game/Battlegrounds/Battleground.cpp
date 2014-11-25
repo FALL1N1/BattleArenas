@@ -872,6 +872,10 @@ void Battleground::EndBattleground(uint32 winner)
 		// And Badge of Justice as reward from Solo Queue
 	    if (team == winner && isArena())
 		{
+			// Don't reward leavers in arena preparation
+			if (player->HasAura(SPELL_ARENA_PREPARATION))
+				return;
+
 			if (isRated())
 			{
 			    if (GetArenaType() == ARENA_TYPE_2v2)
