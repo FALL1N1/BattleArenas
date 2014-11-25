@@ -64,14 +64,21 @@ public:
 			player->EquipNewItem(EQUIPMENT_SLOT_HEAD, 12064, true);
 		}
 
-		// Prevent players to log in with the same ip
+		// Prevent players to log in with the same IP
 		SessionMap sessions = sWorld->GetAllSessions();
 		for (SessionMap::iterator itr = sessions.begin(); itr != sessions.end(); ++itr)
 			if (Player* plr = itr->second->GetPlayer())
 			{
-				if (plr != player) // Dont check adresses of same character (?)
-					if (plr->GetSession()->GetRemoteAddress() == player->GetSession()->GetRemoteAddress())
+				// GMs can log with more that one character
+				if (player->GetSession()->GetSecurity() >= 3)
+					return;
+
+				// but players are not able to
+				if (player != plr) // Just in case to not face the same IP as player's IP
+				{
+					if (player->GetSession()->GetRemoteAddress() == plr->GetSession()->GetRemoteAddress())
 						player->GetSession()->KickPlayer();
+				}
 			}
 	}
 };
