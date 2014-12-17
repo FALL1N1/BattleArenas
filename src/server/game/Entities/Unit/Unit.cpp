@@ -16833,7 +16833,7 @@ void Unit::ApplyResilience(Unit const* victim, float* crit, int32* damage, bool 
             // Crit chance reduction works against nonpets
             if (crit)
 				// Increase crit chance reduction from resilience by 10%
-                *crit -= target->GetMeleeCritChanceReduction()/**1.1*/;
+                *crit -= target->GetMeleeCritChanceReduction();
             if (source && damage)
             {
                 if (isCrit)
@@ -16845,7 +16845,7 @@ void Unit::ApplyResilience(Unit const* victim, float* crit, int32* damage, bool 
             // Crit chance reduction works against nonpets
             if (crit)
 				// Increase crit chance reduction from resilience by 10%
-                *crit -= target->GetRangedCritChanceReduction()/**1.1*/;
+                *crit -= target->GetRangedCritChanceReduction();
             if (source && damage)
             {
                 if (isCrit)
@@ -16857,7 +16857,7 @@ void Unit::ApplyResilience(Unit const* victim, float* crit, int32* damage, bool 
             // Crit chance reduction works against nonpets
             if (crit)
 				// Increase crit chance reduction from resilience by 10%
-                *crit -= target->GetSpellCritChanceReduction()/**1.1*/;
+                *crit -= target->GetSpellCritChanceReduction();
             if (source && damage)
             {
                 if (isCrit)
@@ -17035,8 +17035,8 @@ uint32 Unit::GetCombatRatingDamageReduction(CombatRating cr, float rate, float c
 	// This is used to properly calculate resilience
 	// damage reduction tested in Arena-Tournament and
 	// decided to add flat value to all dmg and critical 
-	// chance reduction effects by additional 2%
-    return CalculatePctF(damage, percent += 2);
+	// chance reduction effects by additional 1.5%
+    return CalculatePctF(damage, percent += 1.5);
 }
 
 uint32 Unit::GetModelForForm(ShapeshiftForm form)
