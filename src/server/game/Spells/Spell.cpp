@@ -5785,7 +5785,7 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
     };
     uint8 CCDArraySize = 6;
 	
-    const uint32 delayForInstantSpells = 80;
+    const uint32 delayForInstantSpells = 100;
 
 	switch(_spell->SpellFamilyName)
     {
