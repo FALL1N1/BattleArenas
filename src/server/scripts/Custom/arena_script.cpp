@@ -24,7 +24,7 @@ class Arena_Scripts : public PlayerScript
 {
 public:
 	Arena_Scripts() : PlayerScript("Arena_Scripts") {  }
-	
+
 	// Spawn objects for Mages and Warlocks in arena preparation
 	void OnUpdateZone(Player* player, uint32 zone, uint32 area)
 	{
@@ -49,7 +49,7 @@ public:
 		float ang = player->GetOrientation();
 		float rot2 = std::sin(ang/2);
 		float rot3 = std::cos(ang/2);
-		
+
 		switch (player->getClass())
 		{
 		case CLASS_MAGE:
@@ -59,7 +59,7 @@ public:
 						player->SummonGameObject(193061, x+2, y+2, z, ang, 0, 0, rot2, rot3, 30);
 			}
 			break;
-		
+
 		case CLASS_WARLOCK:
 			{
 				if (Battleground *bg = player->GetBattleground())
@@ -85,7 +85,7 @@ public:
 		if (pKiller->GetSession()->GetRemoteAddress() == pKilled->GetSession()->GetRemoteAddress())
 			return;
 
-	    // Don't reward BoJ if player is in arena or is with HT aura present
+		// Don't reward BoJ if player is in arena or is with HT aura present
 		if (pKiller->InArena() || pKilled->InArena() || pKilled->HasAura(HONORLESS_TARGET))
 			return;
 
