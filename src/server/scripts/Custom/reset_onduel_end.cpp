@@ -56,9 +56,9 @@ class Reset_OnDuelEnd : public PlayerScript
         void OnDuelEnd(Player * pWinner, Player * pLooser, DuelCompleteType type)
         {   
 			// Scrubs are not allowed to spam the announcer
-			//if (type != DUEL_WON)
-			//	return;
-			//
+			if (type != DUEL_WON)
+				return;
+			
 			pWinner->SetHealth(pWinner->GetMaxHealth());
             pWinner->SetPower(POWER_MANA, pWinner->GetMaxPower(POWER_MANA));
             pLooser->SetHealth(pLooser->GetMaxHealth());

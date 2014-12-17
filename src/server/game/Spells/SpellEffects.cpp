@@ -778,7 +778,8 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     m_caster->InterruptSpell(CURRENT_CHANNELED_SPELL);  // break channeled spells
                     m_caster->AttackStop();
                     ((Player*)m_caster)->SendAttackSwingCancelAttack();
-                    m_caster->CombatStop();
+                    //m_caster->CombatStop();
+					m_caster->ClearInCombat();
 					m_caster->SendClearTarget();
                     return;
                 }
@@ -921,7 +922,8 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
             {
                 unitTarget->RemoveMovementImpairingAuras();
                 unitTarget->RemoveAurasByType(SPELL_AURA_MOD_STALKED);
-				unitTarget->CombatStop();
+				//unitTarget->CombatStop();
+				unitTarget->ClearInCombat();
 				unitTarget->SendClearTarget();
 
                 // If this spell is given to an NPC, it must handle the rest using its own AI

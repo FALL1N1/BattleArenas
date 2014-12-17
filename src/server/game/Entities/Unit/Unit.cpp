@@ -1706,7 +1706,7 @@ uint32 Unit::CalcSpellResistance(Unit* victim, SpellSchoolMask schoolMask, Spell
     
 
         ignoredResistance = std::min<int32>(ignoredResistance, 100);
-        ApplyPct(victimResistance, 100 - ignoredResistance);
+        ApplyPctN(victimResistance, 100 - ignoredResistance);
     }
 
 	 victimResistance += (levelDiff * 5); // Level diff resistance cannot be pierced
@@ -1750,7 +1750,7 @@ uint32 Unit::CalcSpellResistance(Unit* victim, SpellSchoolMask schoolMask, Spell
 
 void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffectType damagetype, uint32 const damage, uint32* absorb, uint32* resist, SpellInfo const* spellInfo /*= NULL*/, int32 calc_resist /*= -1*/)
 {
-    if (!victim || !victim->IsAlive() || !damage)
+    if (!victim || !victim->isAlive() || !damage)
         return;
 
     DamageInfo dmgInfo = DamageInfo(this, victim, damage, spellInfo, schoolMask, damagetype);
@@ -2679,7 +2679,7 @@ uint32 Unit::CalcMagicSpellHitChance(Unit* victim, SpellSchoolMask schoolMask, S
 SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo)
 {
     // Can't miss on dead target (on skinning for example)
-    if (!victim->IsAlive() && victim->GetTypeId() != TYPEID_PLAYER)
+    if (!victim->isAlive() && victim->GetTypeId() != TYPEID_PLAYER)
         return SPELL_MISS_NONE;
 
     SpellSchoolMask schoolMask = spellInfo->GetSchoolMask();
@@ -2699,7 +2699,7 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
     ignoredResistance = std::min<int32>(ignoredResistance, 100);
   
 	// cast by caster in front of victim
-    int32 deflect_chance = CalculatePct(victim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS), 100 - ignoredResistance) * 100;
+    int32 deflect_chance = CalculatePctN(victim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS), 100 - ignoredResistance) * 100;
 
     if (!victim->HasAuraType(SPELL_AURA_MOD_STUN) && !(spellInfo->AttributesEx3 & SPELL_ATTR3_IGNORE_HIT_RESULT) && deflect_chance > 0)
         if (victim->HasInArc(M_PI, this) || victim->HasAuraType(SPELL_AURA_IGNORE_HIT_DIRECTION))
@@ -2710,7 +2710,7 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
                 return SPELL_MISS_DEFLECT;
         }
  
-    int32 miss = CalculatePct(10000 - CalcMagicSpellHitChance(victim, schoolMask, spellInfo), 100 - ignoredResistance);
+    int32 miss = CalculatePctN(10000 - CalcMagicSpellHitChance(victim, schoolMask, spellInfo), 100 - ignoredResistance);
 
     int32 rand = irand(0, 10000);
 
@@ -12471,7 +12471,8 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
         return;
 
     if (PvP)
-        m_CombatTimer = 5000;
+	    //Combat Timer in PVP should be 5.55 sec instead of 5 sec
+		m_CombatTimer = 5550;
 
     if (isInCombat() || HasUnitState(UNIT_STATE_EVADE))
         return;
@@ -17103,8 +17104,9 @@ uint32 Unit::GetCombatRatingDamageReduction(CombatRating cr, float rate, float c
 	// This is used to properly calculate resilience
 	// damage reduction tested in Arena-Tournament and
 	// decided to add flat value to all dmg and critical 
-	// chance reduction effects by additional 1.5%
-    return CalculatePctF(damage, percent += 1.5);
+	// chance reduction effects by additional 1%
+    //return CalculatePctF(damage, percent += 1);
+	return CalculatePctF(damage, percent);
 }
 
 uint32 Unit::GetModelForForm(ShapeshiftForm form)
