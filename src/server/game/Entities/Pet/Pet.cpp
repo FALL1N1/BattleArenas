@@ -1058,7 +1058,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
 					// 51963 - gargoyle strike dmg
 					// Minor nerf added in revision 0424 (was 0.66f)
-					SetBonusDamage(int32(m_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f));
+					SetBonusDamage(int32(m_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.66f));
 					SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
 					SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
 					break;
