@@ -2030,20 +2030,19 @@ public:
                     me->DespawnOrUnsummon();
                 return;
             }
-
+			// REVERT COMMIT BY BLINDSPELL ABOUT EBON GARGOYLE:
+			// SHOULD NOT SWITCH TARGETS
 			// Ebon Gargoyle should attack DKs targets
-			if (!me->getVictim())
-				if (owner && owner->getVictim())
-					AttackStart(owner->getVictim());
-
-			if (me->getVictim() && me->getVictim() != owner->getVictim())
-				AttackStart(owner->getVictim());
-  
-            else if (target && target->isAlive())
-			{
-				AttackStart(target);
-			}
-
+			//if (!me->getVictim())
+			//	if (owner && owner->getVictim())
+			//		AttackStart(owner->getVictim());
+			//
+			//if (me->getVictim() && me->getVictim() != owner->getVictim())
+			//	AttackStart(owner->getVictim());
+            //else if (target && target->isAlive())
+			//{
+			//	AttackStart(target);
+			//}
             CasterAI::UpdateAI(diff);
         }
     };
