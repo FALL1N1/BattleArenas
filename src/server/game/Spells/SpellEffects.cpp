@@ -376,7 +376,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 						if (unitTarget->GetTypeId() == TYPEID_PLAYER || m_targets.GetUnitTarget()->getVictim() == m_caster)
 							return;
 
-                        damage += uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)); // should be 0.5f
+                        damage += uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f); // should be 0.5f
                         break;
 					}
                     // Loken Pulsing Shockwave
@@ -647,7 +647,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         {
                             float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
 							damage += irand(int32(ap * combo * 0.05f), int32(ap * combo * 0.07f));
-							damage *= 1.2f; // Increase eviscerate damage by 20% by Natureknight
+							damage *= 1.15f; // Increase eviscerate damage by 20% by Natureknight
 
                             // Eviscerate and Envenom Bonus Damage (item set effect)
                             if (m_caster->HasAura(37169))
@@ -3272,10 +3272,6 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         SendCastResult(SPELL_FAILED_DONT_REPORT);
         return;
     }
-	//
-	// Hand of Reckoning
-	//if (m_spellInfo->Id == 62124)
-    //    m_caster->CastSpell(unitTarget, 67485, true);
 	
     // Also use this effect to set the taunter's threat to the taunted creature's highest value
     if (unitTarget->getThreatManager().getCurrentVictim())
