@@ -47,8 +47,8 @@ public:
         if (sWorld->getBoolConfig(CONFIG_SOLO_3V3_FILTER_TALENTS))
         {
             infoQueue << "\n\n";
-            infoQueue << "Queued Melees: " << cache3v3Queue[MELEE] << "\n";
-            infoQueue << "Queued Casters: " << cache3v3Queue[RANGE] << "\n";
+            infoQueue << "Queued Melees: " << cache3v3Queue[MELEE] << " (Longer Queues!)" << "\n";
+            infoQueue << "Queued Casters: " << cache3v3Queue[RANGE] << " (Longer Queues!)" << "\n";
             infoQueue << "Queued Healers: " << cache3v3Queue[HEALER] << " (Bonus Rewards!)" << "\n";
         }
 

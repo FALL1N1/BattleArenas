@@ -2969,13 +2969,14 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE_EFF0;
 				break;
 			case 34709: // Shadow Sight (Arena)
+			case 62239: // Brightleaf Flux (Arena spell +10% dmg)
 				// This attribute can be used also 
 				// for hunter's traps detection problems
 				spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
 				// and make it debuff instead of buff
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE_EFF0;
                 break;
-			// Traps can detect stealthed
+			// Traps can detect stealthed players and units
 			case 14309: // Freezing Trap
 			case 60210: // Freezing Trap
 			case 13810: // Frost trap 1

@@ -25,6 +25,7 @@ public:
 
 	void OnUpdateZone(Player* pPlayer, uint32 newZone, uint32 newArea)
 	{
+		// Forbidden areas:
 		switch (pPlayer->GetAreaId())
 		{
 		case AREA_VIP_MALL:
@@ -70,7 +71,8 @@ public:
 			if (Player* plr = itr->second->GetPlayer())
 			{
 				// GMs can log with more that one character
-				if (player->GetSession()->GetSecurity() >= 3)
+				if (player->GetSession()->GetSecurity() >= 3 ||
+					plr->GetSession()->GetSecurity() >= 3)
 					return;
 
 				// but players are not able to
