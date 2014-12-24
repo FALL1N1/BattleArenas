@@ -1621,7 +1621,8 @@ uint32 Unit::CalcArmorReducedDamage(Unit* victim, const uint32 damage, SpellInfo
 			maxArmorPen = 400 + 85 * victim->getLevel() + 4.5f * 85 * (victim->getLevel() - 59);
 
 		// Cap armor penetration to this number
-		maxArmorPen = std::min((armor + maxArmorPen) / 3, armor);
+		// Increase cap of armor penetration (2.5f was 3)
+		maxArmorPen = std::min((armor + maxArmorPen) / 2.5f, armor);
 		// Figure out how much armor do we ignore
 		float armorPen = CalculatePctF(maxArmorPen, bonusPct + ToPlayer()->GetRatingBonusValue(CR_ARMOR_PENETRATION));
 		// Got the value, apply it
