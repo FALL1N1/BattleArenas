@@ -222,8 +222,8 @@ class spell_pri_penance : public SpellScriptLoader
                     if (caster->IsFriendlyTo(unitTarget))
                         caster->CastSpell(unitTarget, sSpellMgr->GetSpellWithRank(PRIEST_SPELL_PENANCE_R1_HEAL, rank), false, 0);
 					// AllowTwoSide.Interaction.Group will break this spell so
-					// set friendly also players in your party or raid group
-					else if (caster->IsInRaidWith(unitTarget))
+					// set friendly also players in your party or raid group only in arena or bg
+					else if (caster->IsInRaidWith(unitTarget) && caster->GetMap()->IsBattlegroundOrArena())
 						caster->CastSpell(unitTarget, sSpellMgr->GetSpellWithRank(PRIEST_SPELL_PENANCE_R1_HEAL, rank), false, 0);
                     else
                         caster->CastSpell(unitTarget, sSpellMgr->GetSpellWithRank(PRIEST_SPELL_PENANCE_R1_DAMAGE, rank), false, 0);

@@ -288,8 +288,8 @@ class spell_pal_holy_shock : public SpellScriptLoader
                     if (caster->IsFriendlyTo(unitTarget))
                         caster->CastSpell(unitTarget, sSpellMgr->GetSpellWithRank(PALADIN_SPELL_HOLY_SHOCK_R1_HEALING, rank), true, 0);
 					// AllowTwoSide.Interaction.Group will break this spell so
-					// set friendly also players in your party or raid group
-					else if (caster->IsInRaidWith(unitTarget))
+					// set friendly also players in your party or raid group only in arena or bg
+					else if (caster->IsInRaidWith(unitTarget) && caster->GetMap()->IsBattlegroundOrArena())
 						caster->CastSpell(unitTarget, sSpellMgr->GetSpellWithRank(PALADIN_SPELL_HOLY_SHOCK_R1_HEALING, rank), true, 0);
                     else
                         caster->CastSpell(unitTarget, sSpellMgr->GetSpellWithRank(PALADIN_SPELL_HOLY_SHOCK_R1_DAMAGE, rank), true, 0);
