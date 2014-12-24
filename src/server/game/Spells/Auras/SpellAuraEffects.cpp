@@ -520,8 +520,9 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                     // Power Word: Shield
                     if (GetSpellInfo()->SpellFamilyFlags[0] & 0x1 && GetSpellInfo()->SpellFamilyFlags[2] & 0x400)
                     {
-                        // +85.68% from sp bonus (was 80.68 original)
-                        float bonus = 0.8568f;
+						// Reverted boost for Power Word: Shield (was 0.8568f with boost)
+						// and now is blizzlike:
+                        float bonus = 0.8068f;
 
                         // Borrowed Time
                         if (AuraEffect const* pAurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 2899, 1))
@@ -590,9 +591,15 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         case SPELL_AURA_DUMMY:
             if (!caster)
                 break;
-            // Earth Shield
-            if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags[1] & 0x400)
-                amount = caster->SpellHealingBonus(GetBase()->GetUnitOwner(), GetSpellInfo(), amount, SPELL_DIRECT_DAMAGE);
+			// Earth Shield
+			if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags[1] & 0x400)
+			{
+				amount = caster->SpellHealingBonus(GetBase()->GetUnitOwner(), GetSpellInfo(), amount, SPELL_DIRECT_DAMAGE);
+
+				// Remove double heal-reduction from Earth Shield
+				if (int32 modifier = caster->GetMaxNegativeAuraModifier(SPELL_AURA_MOD_HEALING_PCT))
+					ApplyPctF(amount, -10000.0f / float(modifier));
+			}
             break;
         case SPELL_AURA_PERIODIC_DAMAGE:
             if (!caster)
