@@ -696,11 +696,6 @@ void Spell::SelectExplicitTargets()
 			|| (m_spellInfo->GetExplicitTargetMask() & TARGET_FLAG_UNIT && !m_spellInfo->IsPositive()))
 		{
 			Unit* redirect;
-
-			// Grounding Totem should also redirect dispel effects
-			if (m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL))
-				redirect = m_caster->GetMagicHitRedirectTarget(target, m_spellInfo);
-
 			switch (m_spellInfo->DmgClass)
 			{
 			case SPELL_DAMAGE_CLASS_MAGIC:

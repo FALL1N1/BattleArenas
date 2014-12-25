@@ -1623,7 +1623,7 @@ bool SpellInfo::CheckTargetCreatureType(Unit const* target) const
 			return true;
 	}
 
-	// skip creature type check for Grounding Totem
+	// Skip creature type check for Grounding Totem
 	if (target->GetUInt32Value(UNIT_CREATED_BY_SPELL) == 8177)
 		return true;
 
