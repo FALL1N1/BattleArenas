@@ -71,8 +71,7 @@ public:
 			if (Player* plr = itr->second->GetPlayer())
 			{
 				// GMs can log with more that one character
-				if (player->GetSession()->GetSecurity() >= 3 ||
-					plr->GetSession()->GetSecurity() >= 3)
+				if (player->GetSession()->GetSecurity() >= 3)
 					return;
 
 				// but players are not able to
