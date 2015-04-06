@@ -1254,8 +1254,7 @@ void AddBattlegroundScripts()
     void AddSC_transmog();
     void AddSC_StartUpTransmog();
     void AddSC_CooldownsCrystal();
-    void AddSC_template_npc();
-    void AddSC_createItemSet_commandscript();
+    void AddSC_TemplateNPC();
     void AddSC_npc_solo3v3();
 #endif
 
@@ -1291,8 +1290,7 @@ void AddCustomScripts()
     AddSC_transmog();
     AddSC_StartUpTransmog();
     AddSC_CooldownsCrystal();
-    AddSC_template_npc();
-    AddSC_createItemSet_commandscript();
+    AddSC_TemplateNPC();
     AddSC_npc_solo3v3();
 #endif
 }
