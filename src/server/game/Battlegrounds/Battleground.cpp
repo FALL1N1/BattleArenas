@@ -2118,6 +2118,7 @@ uint8 Battleground::ClickFastStart(Player *player, GameObject *go)
 		m_crystals.insert(go);
 
 	uint8 playersNeeded = 0;
+
 	switch(GetArenaType())
 	{
 	case ARENA_TYPE_2v2:
@@ -2154,10 +2155,10 @@ void Battleground::DespawnCrystals()
 	if (m_crystals.empty())
 		return;
 
-	for (std::set<GameObject*>::iterator itr = m_crystals.begin(); itr != m_crystals.end(); ++itr)
+	/*for (std::set<GameObject*>::iterator itr = m_crystals.begin(); itr != m_crystals.end(); ++itr)
 	{
 		GameObject *go = *itr;
 		go->Delete();
 		m_crystals.erase(itr);
-	}
+	}*/
 }
