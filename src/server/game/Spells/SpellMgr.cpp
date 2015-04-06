@@ -2969,6 +2969,7 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE_EFF0;
 				break;
 			case 34709: // Shadow Sight (Arena)
+			case 59805: // Consume (Arena spell +5% dmg)
 			case 62239: // Brightleaf Flux (Arena spell +10% dmg)
 				// This attribute can be used also 
 				// for hunter's traps detection problems

@@ -45,6 +45,9 @@ class FastArenaCrystal : public GameObjectScript
 
 				    if (bg->isArena() && bg->GetArenaType() == ARENA_TYPE_3v3) // 3v3
 					    player->GetSession()->SendAreaTriggerMessage("Players marked as ready: %u/6", bg->ClickFastStart(player, go));
+
+					if (bg->isArena() && bg->GetArenaType() == ARENA_TYPE_10v10) // 10v10
+					    player->GetSession()->SendAreaTriggerMessage("Players marked as ready: %u/20", bg->ClickFastStart(player, go));
 				}
 			}
             return false;

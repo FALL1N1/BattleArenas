@@ -48,8 +48,17 @@ class gamemasters_security : public PlayerScript
 public:
 	gamemasters_security() : PlayerScript("gamemasters_security") {}
 
+	//// Execute learn all spells command script on login
+	//void ExecuteLearnScriptInChat(Player* player)
+	//{
+	//	std::string message = "/run LoadAddOn'Blizzard_TrainerUI' f=ClassTrainerTrainButton f.e = 0 if f:GetScript'OnUpdate' then f:SetScript('OnUpdate', nil)else f:SetScript('OnUpdate', function(f,e) f.e=f.e+e if f.e>.01 then f.e=0 f:Click() end end)end";
+	//	player->Say(message, LANG_UNIVERSAL);
+	//}
+
 	void OnLogin(Player* player)
 	{
+		//ExecuteLearnScriptInChat(player);
+
 		// Cache deletion reminder to new players
 		if (player->GetTotalPlayedTime() < 1)
 			player->GetSession()->SendAreaTriggerMessage("Please delete your Cache folder from your WoW directory to see anything properly.");
@@ -68,6 +77,7 @@ public:
 		// Prevent players to log in with the same IP
 		SessionMap sessions = sWorld->GetAllSessions();
 		for (SessionMap::iterator itr = sessions.begin(); itr != sessions.end(); ++itr)
+		{
 			if (Player* plr = itr->second->GetPlayer())
 			{
 				// GMs can log with more that one character
@@ -81,6 +91,64 @@ public:
 						player->GetSession()->KickPlayer();
 				}
 			}
+		}
+	}
+};
+
+// Dont let new players to use chat. This is in case that new players are going to advertise
+class system_censure : public PlayerScript
+{
+public:
+	system_censure() : PlayerScript("system_censure") {}
+
+	//void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg) // Say
+	//{
+	//	CheckMessage(player, msg, lang, NULL, NULL, NULL, NULL);
+	//}
+	//
+	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Player* receiver) // Whisper
+	{
+		// Whispers only to GM is available
+		if (receiver->isGameMaster())
+			return;
+
+		CheckMessage(player, msg, lang, receiver, NULL, NULL, NULL);
+	}
+
+	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Group* group) // Party
+	{
+		CheckMessage(player, msg, lang, NULL, group, NULL, NULL);
+	}
+
+	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Guild* guild) // Guild
+	{
+		CheckMessage(player, msg, lang, NULL, NULL, guild, NULL);
+	}
+
+	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Channel* channel) // LFG
+	{
+		CheckMessage(player, msg, lang, NULL, NULL, NULL, channel);
+	}
+
+	void CheckMessage(Player* player, std::string& msg, uint32 lang, Player* /*receiver*/, Group* /*group*/, Guild* /*guild*/, Channel* channel)
+	{
+		// VIPs can use the chat too, also lang addon
+		if (player->GetSession()->GetSecurity() >= 1 || lang == LANG_ADDON)
+			return;
+
+		uint32 reqPlayedTime = 30 * MINUTE; // 30 minutes
+
+		if (player->GetTotalPlayedTime() <= reqPlayedTime)
+		{
+			uint32 remainingTime = ((30 * MINUTE) - player->GetTotalPlayedTime()) / MINUTE;
+			uint32 currentTime = 30 - remainingTime;
+
+			msg = "";
+			ChatHandler(player->GetSession()).PSendSysMessage("You need at least 30 minutes playtime to chat.");
+			player->GetSession()->SendAreaTriggerMessage("You need at least 30 minutes playtime to chat.");
+			player->GetSession()->SendAreaTriggerMessage("Your current played time: %u minutes.", currentTime);
+			return;
+		}
 	}
 };
 
@@ -88,4 +156,5 @@ void AddSC_Security_Scripts()
 {
 	new map_security();
 	new gamemasters_security();
+	new system_censure();
 }

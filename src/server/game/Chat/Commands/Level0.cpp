@@ -92,7 +92,7 @@ bool ChatHandler::HandleServerInfoCommand(const char* /*args*/)
 	std::string uptime = secsToTimeString(sWorld->GetUptime());
 	uint32 updateTime = sWorld->GetUpdateTime();
 
-	PSendSysMessage("BACore Custom Rev: WIN320432-21-DEC-2014 (Release)");
+	PSendSysMessage("BACore Custom Rev: WIN32-0442-29-JAN-2015 (Release)");
 	PSendSysMessage("Developed by Natureknight");
 
 	// Select also the fake players and display the info
@@ -127,7 +127,7 @@ bool ChatHandler::HandleDismountCommand(const char* /*args*/)
 {
 	Player* player = m_session->GetPlayer();
 
-	//If player is not mounted, so go out :)
+	// If player is not mounted, so go out :)
 	if (!player->IsMounted())
 	{
 		SendSysMessage(LANG_CHAR_NON_MOUNTED);

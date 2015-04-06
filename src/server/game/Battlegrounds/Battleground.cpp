@@ -877,7 +877,7 @@ void Battleground::EndBattleground(uint32 winner)
 				// Dont reward players in arena preparation
 				if (!player->HasAura(SPELL_ARENA_PREPARATION))
 				{
-					if (GetArenaType() == ARENA_TYPE_2v2)
+					if (GetArenaType() == ARENA_TYPE_2v2 || GetArenaType() == ARENA_TYPE_10v10)
 						player->AddItem(54218, 1);  // Add one BattleArenas Reward Box
 
 					if (GetArenaType() == ARENA_TYPE_3v3)
@@ -1236,7 +1236,8 @@ void Battleground::AddPlayer(Player* player)
 	// add arena specific auras
 	if (isArena())
 	{
-		player->RemoveArenaEnchantments(TEMP_ENCHANTMENT_SLOT);
+		// Don't remove Earthliving Weapon (e.g.) when entering arena so comment out this row :P
+		//player->RemoveArenaEnchantments(TEMP_ENCHANTMENT_SLOT);
 		if (team == ALLIANCE)                                // gold
 		{
 			if (player->GetTeam() == HORDE)
@@ -2127,6 +2128,9 @@ uint8 Battleground::ClickFastStart(Player *player, GameObject *go)
 		break;
 	case ARENA_TYPE_5v5:
 		playersNeeded = 2;
+		break;
+	case ARENA_TYPE_10v10:
+		playersNeeded = 20;
 		break;
 	case ARENA_TYPE_3v3_SOLO:
 		playersNeeded = 6;

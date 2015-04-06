@@ -985,6 +985,10 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
                 MaxPlayersPerTeam = 3;
 				MinPlayersPerTeam = 3;
 				break;
+			case ARENA_TYPE_10v10:
+				MaxPlayersPerTeam = 10;
+				MinPlayersPerTeam = 10;
+				break;
             }
         }
     }

@@ -32,8 +32,8 @@ public:
 			return false;
 
 		uint64 guid = player->GetGUID();
-		uint8 arenaslot = ArenaTeam::GetSlotByType(ARENA_TEAM_5v5);
-		uint8 arenatype = ARENA_TYPE_5v5;
+		uint8 arenaslot = ArenaTeam::GetSlotByType(ARENA_TYPE_10v10);
+		uint8 arenatype = ARENA_TYPE_10v10;
 		uint32 arenaRating = 0;
 		uint32 matchmakerRating = 0;
 
@@ -172,22 +172,23 @@ public:
 			return true;
 		}
 
-		if (player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5))
-			player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Leave queue 1v1 Arena", GOSSIP_SENDER_MAIN, 3, "Are you sure?", 0, false);
+		if (player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_10v10))
+			player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Leave 10v10 Skirmish Queue", GOSSIP_SENDER_MAIN, 3, "Are you sure?", 0, false);
 		else
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Sign up 1v1 Arena (Unrated)", GOSSIP_SENDER_MAIN, 20);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Join 10v10 Skirmish Arena", GOSSIP_SENDER_MAIN, 20);
 
-		if (player->GetArenaTeamId(ArenaTeam::GetSlotByType(ARENA_TEAM_5v5)) == NULL)
-		    player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Create new 1v1 Arena team", GOSSIP_SENDER_MAIN, 1, "Create 1v1 arenateam?", sWorld->getIntConfig(CONFIG_ARENA_1V1_COSTS), false);
-		else
-		{
-			if (player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5) == false)
-			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Sign up 1v1 Arena (Rated)", GOSSIP_SENDER_MAIN, 2);
-				player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Disband Arena Team", GOSSIP_SENDER_MAIN, 5, "Are you sure?", 0, false);
-			}
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Show statistics", GOSSIP_SENDER_MAIN, 4);
-		}
+		//if (player->GetArenaTeamId(ArenaTeam::GetSlotByType(ARENA_TEAM_5v5)) == NULL)
+		//    player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Create new 1v1 Arena team", GOSSIP_SENDER_MAIN, 1, "Create 1v1 arenateam?", sWorld->getIntConfig(CONFIG_ARENA_1V1_COSTS), false);
+		//else
+		//{
+		//	if (player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5) == false)
+		//	{
+		//		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Sign up 1v1 Arena (Rated)", GOSSIP_SENDER_MAIN, 2);
+		//		player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Disband Arena Team", GOSSIP_SENDER_MAIN, 5, "Are you sure?", 0, false);
+		//	}
+		//	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Show statistics", GOSSIP_SENDER_MAIN, 4);
+		//}
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Script Information", GOSSIP_SENDER_MAIN, 8);
 		player->SEND_GOSSIP_MENU(60014, me->GetGUID());
 		return true;
 	}
@@ -231,7 +232,8 @@ public:
 
 		case 20: // Join Queue Arena (unrated)
 			{
-				if(Arena1v1CheckTalents(player) && JoinQueueArena(player, me, false) == false)
+				// Remove the talents check for 10v10 only
+				if(/*Arena1v1CheckTalents(player) && */JoinQueueArena(player, me, false) == false)
 					ChatHandler(player->GetSession()).SendSysMessage("Something went wrong while join queue.");
 				
 				player->CLOSE_GOSSIP_MENU();
@@ -241,8 +243,12 @@ public:
 
 		case 3: // Leave Queue
 			{
+				uint8 arenaType = ARENA_TYPE_10v10;
+				if (player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3_SOLO))
+					arenaType = ARENA_TYPE_3v3_SOLO;
+
 				WorldPacket Data;
-				Data << (uint8)0x1 << (uint8)0x0 << (uint32)BATTLEGROUND_AA << (uint16)0x0 << (uint8)0x0;
+				Data << arenaType << (uint8)0x0 << (uint32)BATTLEGROUND_AA << (uint16)0x0 << (uint8)0x0;
 				player->GetSession()->HandleBattleFieldPortOpcode(Data);
 				player->CLOSE_GOSSIP_MENU();
 				return true;
@@ -281,11 +287,9 @@ public:
 
 		case 8: // Script Info
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Developer: Teiby", GOSSIP_SENDER_MAIN, uiAction);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Website: www.teiby.de", GOSSIP_SENDER_MAIN, uiAction);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Version: 2.0", GOSSIP_SENDER_MAIN, uiAction);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "<-- Back", GOSSIP_SENDER_MAIN, 7);
-				player->SEND_GOSSIP_MENU(68, me->GetGUID());
+				player->GetSession()->SendAreaTriggerMessage("Developer: Natureknight");
+				player->GetSession()->SendAreaTriggerMessage("Website: battlearenas.no-ip.org");
+				player->CLOSE_GOSSIP_MENU();
 				return true;
 			}
 			break;

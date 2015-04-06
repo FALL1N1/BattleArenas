@@ -2030,19 +2030,28 @@ public:
 					me->DespawnOrUnsummon();
 				return;
 			}
-			// REVERT COMMIT BY BLINDSPELL ABOUT EBON GARGOYLE:
-			// SHOULD NOT SWITCH TARGETS
-			// Ebon Gargoyle should attack DKs targets
-			//if (!me->getVictim())
-			//	if (owner && owner->getVictim())
-			//		AttackStart(owner->getVictim());
-			//
-			//if (me->getVictim() && me->getVictim() != owner->getVictim())
-			//	AttackStart(owner->getVictim());
-			//else if (target && target->isAlive())
-			//{
-			//	AttackStart(target);
-			//}
+
+			// TESTFIX: Ebon Gargoyle should switch targets
+			// depending on Ghoul's target if there's any sumoned,
+			// if not, then should switch depending on DKs target
+
+			// Describe another pet (Ghoul in this case)
+			Pet* pet = owner->ToPlayer()->GetPet();
+
+			// Ebon Gargoyle should target Ghoul's target:
+			if (pet && pet->IsPetGhoul())
+			{
+				if (!me->getVictim())
+					if (pet && pet->getVictim())
+						AttackStart(pet->getVictim());
+
+				// If victim is not equal to Ghoul's victim, then switch targets
+				if (me->getVictim() && me->getVictim() != pet->getVictim())
+					AttackStart(pet->getVictim());
+				// Normal case
+				else if (target && target->isAlive())
+					AttackStart(target);
+			}
 			CasterAI::UpdateAI(diff);
 		}
 	};

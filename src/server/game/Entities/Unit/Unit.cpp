@@ -1621,8 +1621,8 @@ uint32 Unit::CalcArmorReducedDamage(Unit* victim, const uint32 damage, SpellInfo
 			maxArmorPen = 400 + 85 * victim->getLevel() + 4.5f * 85 * (victim->getLevel() - 59);
 
 		// Cap armor penetration to this number
-		// Increase cap of armor penetration (2.5f was 3)
-		maxArmorPen = std::min((armor + maxArmorPen) / 2.5f, armor);
+		// Increase cap of armor penetration (2.75f was 3)
+		maxArmorPen = std::min((armor + maxArmorPen) / 2.75f, armor);
 		// Figure out how much armor do we ignore
 		float armorPen = CalculatePctF(maxArmorPen, bonusPct + ToPlayer()->GetRatingBonusValue(CR_ARMOR_PENETRATION));
 		// Got the value, apply it
@@ -9591,7 +9591,7 @@ FactionTemplateEntry const* Unit::getFactionTemplateEntry() const
 // function based on function Unit::UnitReaction from 13850 client
 ReputationRank Unit::GetReactionTo(Unit const* target) const
 {
-	// always friendly to self
+	// always friendly to self or to party members
 	if (this == target)
 		return REP_FRIENDLY;
 
@@ -12884,13 +12884,12 @@ bool Unit::IsAlwaysVisibleFor(WorldObject const* seer) const
 		if (seer->GetGUID() == guid)
 			return true;
 
-	//Pets should be always visible for group mates by Natureknight
-	/*if (Player const* seerPlayer = seer->ToPlayer())
-	if (Unit* owner =  GetOwner())
-	if (Player* ownerPlayer = owner->ToPlayer())
-	if (ownerPlayer->IsGroupVisibleFor(seerPlayer))
-	return true;*/
-	//Disabled cuz of arenaframe bug by Natureknight
+	//// Pets should be always visible in Arena Preparation for group
+	//if (Player const* seerPlayer = seer->ToPlayer())
+	//	if (Unit* owner =  GetOwner())
+	//		if (Player* ownerPlayer = owner->ToPlayer())
+	//			if (ownerPlayer->IsGroupVisibleFor(seerPlayer))
+	//				return true;
 
 	return false;
 }

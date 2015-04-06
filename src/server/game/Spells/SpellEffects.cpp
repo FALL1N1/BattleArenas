@@ -625,7 +625,8 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 									for (uint32 i = 0; i < doses; ++i)
 										//unitTarget->RemoveAuraFromStack(spellId);
 											//Remove correct stack of Deadly Poison when using Envenom 
-												unitTarget->RemoveAuraFromStack(spellId, m_caster->GetGUID());
+												if (!player->HasAura(64199)) // Glyph of Envenom
+													unitTarget->RemoveAuraFromStack(spellId, m_caster->GetGUID());
 
 								damage *= doses;
 								damage += int32(player->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * combo);
@@ -647,7 +648,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 						{
 							float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
 							damage += irand(int32(ap * combo * 0.05f), int32(ap * combo * 0.07f));
-							damage *= 1.15f; // Increase eviscerate damage by 20% by Natureknight
+							damage *= 1.1f; // Increase eviscerate damage by 10% by Natureknight
 
 							// Eviscerate and Envenom Bonus Damage (item set effect)
 							if (m_caster->HasAura(37169))

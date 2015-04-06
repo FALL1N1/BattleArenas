@@ -4739,8 +4739,10 @@ SpellCastResult Spell::CheckCast(bool strict)
 		{
 			if (m_triggeredByAuraSpell)
 				return SPELL_FAILED_DONT_REPORT;
-			// Shadowform, Gnaw and Raise Dead
-			else if (m_spellInfo->Id != 15473 && m_spellInfo->Id != 47481 && m_spellInfo->Id != 46584) 
+			//                       Shadowform,                   Gnaw               and Raise Dead
+			else if (m_spellInfo->Id == 15473 && m_spellInfo->Id == 47481 && m_spellInfo->Id == 46584)
+				return SPELL_FAILED_FIZZLE;
+			else 
 				return SPELL_FAILED_NOT_READY;
 		}
 	}
@@ -4753,8 +4755,14 @@ SpellCastResult Spell::CheckCast(bool strict)
 
 	// Check global cooldown
 	// Shadowform, Gnaw and Raise Dead
-	if (strict && !(_triggeredCastFlags & TRIGGERED_IGNORE_GCD) && HasGlobalCooldown() && (m_spellInfo->Id != 15473 && m_spellInfo->Id != 47481 && m_spellInfo->Id != 46584))
-		return SPELL_FAILED_NOT_READY;
+	if (strict && !(_triggeredCastFlags & TRIGGERED_IGNORE_GCD) && HasGlobalCooldown())
+	{
+		//     Shadowform                  Gnaw                     Raise Dead
+		if (m_spellInfo->Id == 15473 || m_spellInfo->Id == 47481 || m_spellInfo->Id == 46584)
+			return SPELL_FAILED_FIZZLE;
+		else 
+			return SPELL_FAILED_NOT_READY;
+	}
 
 	// only triggered spells can be processed an ended battleground
 	if (!IsTriggered() && m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -5126,7 +5134,8 @@ SpellCastResult Spell::CheckCast(bool strict)
 						if (m_caster->IsInWater())
 							return SPELL_FAILED_ONLY_ABOVEWATER;
 					}
-					else if (m_spellInfo->SpellIconID == 156)    // Holy Shock
+					else if (m_spellInfo->SpellIconID == 156 || // Holy Shock
+						m_spellInfo->Id == 53007 || m_spellInfo->Id == 53006 || m_spellInfo->Id == 53005 ||m_spellInfo->Id == 47540) // Penance
 					{
 						// spell different for friends and enemies
 						// hurt version required facing

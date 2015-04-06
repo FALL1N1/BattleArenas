@@ -676,6 +676,9 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recv_data)
 		case 3:
             arenatype = ARENA_TYPE_3v3_SOLO;
             break;
+		case 4:
+			arenatype = ARENA_TYPE_10v10;
+			break;
         default:
             sLog->outError("Unknown arena slot %u at HandleBattlemasterJoinArena()", arenaslot);
             return;
