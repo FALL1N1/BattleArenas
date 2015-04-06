@@ -4574,69 +4574,65 @@ bool ChatHandler::HandleUnFreezeCommand(const char *args)
 {
     std::string name;
     Player* player;
-    char* targetName = strtok((char*)args, " "); // Get entered name
+	char* targetName = strtok((char*)args, " "); // Get entered name
 
-    if (targetName)
-    {
-        name = targetName;
-        normalizePlayerName(name);
-        player = sObjectAccessor->FindPlayerByName(name.c_str());
-    }
-    else // If no name was entered - use target
-    {
-        player = getSelectedPlayer();
-        if (player)
-            name = player->GetName();
-    }
+	if (targetName)
+	{
+		name = targetName;
+		normalizePlayerName(name);
+		player = sObjectAccessor->FindPlayerByName(name.c_str());
+	}
+	else // If no name was entered - use target
+	{
+		player = getSelectedPlayer();
+		if (player)
+			name = player->GetName();
+	}
 
-    if (player)
-    {
-        PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
+	if (player)
+	{
+		PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
 
-        // Reset player faction + allow combat + allow duels
-        player->setFactionForRace(player->getRace());
-        player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+		// Reset player faction + allow combat + allow duels
+		//player->setFactionForRace(player->getRace());
+		player->setFactionForRace(player->getORace());
+		player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-        // Remove Freeze spell (allowing movement and spells)
-        player->RemoveAurasDueToSpell(9454);
+		// Remove Freeze spell (allowing movement and spells)
+		player->RemoveAurasDueToSpell(9454);
 
-        // Save player
-        player->SaveToDB();
-    }
-    else
-    {
-        if (targetName)
-        {
-            // Check for offline players
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_BY_NAME);
-            stmt->setString(0, name);
-            PreparedQueryResult result = CharacterDatabase.Query(stmt);
+		// Save player
+		player->SaveToDB();
+	}
+	else
+	{
+		if (targetName)
+		{
+			// Check for offline players
+			QueryResult result = CharacterDatabase.PQuery("SELECT guid FROM characters WHERE name = '%s';", name.c_str());
 
-            if (!result)
-            {
-                SendSysMessage(LANG_COMMAND_FREEZE_WRONG);
-                return true;
-            }
+			if (!result)
+			{
+				SendSysMessage(LANG_COMMAND_FREEZE_WRONG);
+				return true;
+			}
 
-            // If player found: delete his freeze aura
-            Field* fields = result->Fetch();
-            uint32 lowGuid = fields[0].GetUInt32();
+			// If player found: delete his freeze aura
+			Field* fields = result->Fetch();
+			uint32 guid = fields[0].GetUInt32();
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
-            stmt->setUInt32(0, lowGuid);
-            CharacterDatabase.Execute(stmt);
+			CharacterDatabase.PQuery("DELETE FROM character_aura WHERE spell = 9454 AND guid = '%u';", guid);
+			PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
+			return true;
+		}
+		else
+		{
+			SendSysMessage(LANG_COMMAND_FREEZE_WRONG);
+			return true;
+		}
+	}
 
-            PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
-            return true;
-        }
-        else
-        {
-            SendSysMessage(LANG_COMMAND_FREEZE_WRONG);
-            return true;
-        }
-    }
-
-    return true;
+	return true;
 }
 
 bool ChatHandler::HandleListFreezeCommand(const char * /*args*/)
