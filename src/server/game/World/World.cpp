@@ -1056,17 +1056,15 @@ void World::LoadConfigSettings(bool reload)
 
 	m_bool_configs[CONFIG_ARENA_1V1_ENABLE]							 = ConfigMgr::GetBoolDefault("Arena.1v1.Enable", true);
 	m_bool_configs[CONFIG_ARENA_1V1_ANNOUNCER]						 = ConfigMgr::GetBoolDefault("Arena.1v1.Announcer", false);
-	m_bool_configs[CONFIG_ARENA_1V1_MIN_LEVEL]						 = ConfigMgr::GetBoolDefault("Arena.1v1.MinLevel", 80);
-	m_bool_configs[CONFIG_ARENA_1V1_COSTS]							 = ConfigMgr::GetBoolDefault("Arena.1v1.Costs", 400000);
+	m_int_configs[CONFIG_ARENA_1V1_MIN_LEVEL]						 = ConfigMgr::GetIntDefault("Arena.1v1.MinLevel", 80);
+	m_int_configs[CONFIG_ARENA_1V1_COSTS]							 = ConfigMgr::GetIntDefault("Arena.1v1.Costs", 400000);
 	m_bool_configs[CONFIG_ARENA_1V1_VENDOR_RATING]					 = ConfigMgr::GetBoolDefault("Arena.1v1.VendorRating", false);
-	m_bool_configs[CONFIG_ARENA_1V1_ARENAPOINTS_MULTI]				 = ConfigMgr::GetBoolDefault("Arena.1v1.ArenaPointsMulti", 0.64f);
+	m_float_configs[CONFIG_ARENA_1V1_ARENAPOINTS_MULTI]				 = ConfigMgr::GetFloatDefault("Arena.1v1.ArenaPointsMulti", 0.64f);
 	m_bool_configs[CONFIG_ARENA_1V1_BLOCK_FORBIDDEN_TALENTS]		 = ConfigMgr::GetBoolDefault("Arena.1v1.BlockForbiddenTalents", true);
 
 	m_bool_configs[CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN]            = ConfigMgr::GetBoolDefault("OffhandCheckAtSpellUnlearn", true);
 
 	m_bool_configs[BATTLEGROUND_CROSSFACTION_ENABLED]                = ConfigMgr::GetBoolDefault("CrossfactionBG.enable", true);
-	m_bool_configs[SPECTATE_SPECIFIC_PLAYER_ENABLED]                 = ConfigMgr::GetBoolDefault("SpectateSpecificPlayer.enable", true);
-	m_bool_configs[REALM_IS_TOURNAMENT_ENABLED]                      = ConfigMgr::GetBoolDefault("RealmIsTournament.enable", true);
 
 	if (int32 clientCacheId = ConfigMgr::GetIntDefault("ClientCacheVersion", 0))
 	{
