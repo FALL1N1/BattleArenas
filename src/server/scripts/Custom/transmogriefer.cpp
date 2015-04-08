@@ -176,7 +176,7 @@ public:
     bool OnGossipSelect(Player *player, Creature *_creature, uint32 sender, uint32 uiAction)
     {
 		// THIS PART IS USED ONLY ON TOURNAMENT REALM
-		if (sWorld->getBoolConfig(REALM_IS_TOURNAMENT_ENABLED))
+		/*if (sWorld->getBoolConfig(REALM_IS_TOURNAMENT_ENABLED))
 		{
 		    // criteria 451 - max personal 2v2 rate
 		    // criteria 330 - max personal 3v3 rate
@@ -199,7 +199,7 @@ public:
 			    player->CLOSE_GOSSIP_MENU();
 			    return false;
 	        }
-		}
+		}*/
 
         if (sender == GOSSIP_SENDER_MAIN)
         {

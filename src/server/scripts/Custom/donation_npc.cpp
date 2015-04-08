@@ -738,29 +738,25 @@ public:
 		else if (SelectDPoints(pPlayer) >= 7)
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "VIP only for current character (|cff009900Unlocked|r / Click to use)", GOSSIP_SENDER_MAIN, 4);
 
-		// THIS PART IS USED ONLY ON TOURNAMENT REALM
-		if (sWorld->getBoolConfig(REALM_IS_TOURNAMENT_ENABLED))
-		{
-			// WF weapons 1H
-			if (SelectDPoints(pPlayer) < 1)
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Wrathful Offpiece/1H Weapon/Exotic Mount (|cffD80000Locked|r / Min 1 Donation Point needed)", GOSSIP_SENDER_MAIN, 998);
-			else if (SelectDPoints(pPlayer) >= 1)
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Wrathful Offpiece/1H Weapon/Exotic Mount (|cff009900Unlocked|r / Click to use)", GOSSIP_SENDER_MAIN, 5);
 
-			// WF weapon 2H
-			if (SelectDPoints(pPlayer) < 2)
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Wrathful Main Piece/2H Weapon (|cffD80000Locked|r / Min 2 Donation Points needed)", GOSSIP_SENDER_MAIN, 998);
-			else if (SelectDPoints(pPlayer) >= 2)
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Wrathful Main Piece/2H Weapon (|cff009900Unlocked|r / Click to use)", GOSSIP_SENDER_MAIN, 6);
-		}
-		else // THIS IS USED ONLY ON FUN REALM
-		{
-			// Custom Legendary Weapon
-			if (SelectDPoints(pPlayer) < 5)
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Custom Legendary Weapon (|cffD80000Locked|r / Min 5 Donation Points)", GOSSIP_SENDER_MAIN, 998);
-			else if (SelectDPoints(pPlayer) >= 5)
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Custom Legendary Weapon (|cff009900Unlocked|r / Click to use)", GOSSIP_SENDER_MAIN, 7);
-		}
+		// WF weapons 1H
+		if (SelectDPoints(pPlayer) < 1)
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Wrathful Offpiece/1H Weapon/Exotic Mount (|cffD80000Locked|r / Min 1 Donation Point needed)", GOSSIP_SENDER_MAIN, 998);
+		else if (SelectDPoints(pPlayer) >= 1)
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Wrathful Offpiece/1H Weapon/Exotic Mount (|cff009900Unlocked|r / Click to use)", GOSSIP_SENDER_MAIN, 5);
+
+		// WF weapon 2H
+		if (SelectDPoints(pPlayer) < 2)
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Wrathful Main Piece/2H Weapon (|cffD80000Locked|r / Min 2 Donation Points needed)", GOSSIP_SENDER_MAIN, 998);
+		else if (SelectDPoints(pPlayer) >= 2)
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Wrathful Main Piece/2H Weapon (|cff009900Unlocked|r / Click to use)", GOSSIP_SENDER_MAIN, 6);
+
+		// Custom Legendary Weapon
+		if (SelectDPoints(pPlayer) < 5)
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Custom Legendary Weapon (|cffD80000Locked|r / Min 5 Donation Points)", GOSSIP_SENDER_MAIN, 998);
+		else if (SelectDPoints(pPlayer) >= 5)
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Custom Legendary Weapon (|cff009900Unlocked|r / Click to use)", GOSSIP_SENDER_MAIN, 7);
+
 
 		// Titles
 		if (SelectDPoints(pPlayer) < 1)
