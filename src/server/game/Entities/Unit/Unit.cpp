@@ -12624,7 +12624,7 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
 
 	// PvP, PvC, CvP case
 	// can't attack friendly targets
-	if ( GetReactionTo(target) > REP_NEUTRAL
+	if (GetReactionTo(target) > REP_NEUTRAL
 		|| target->GetReactionTo(this) > REP_NEUTRAL)
 		return false;
 
