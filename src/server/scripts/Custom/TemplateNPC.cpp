@@ -842,76 +842,79 @@ public:
 
 	bool OnGossipHello(Player* player, Creature* creature)
 	{
+		// Icons:
+		// |cff00ff00|TInterface\\icons\\ICON_NAME_HERE:30|t|r <text>
+
 		switch (player->getClass())
 		{
 		case CLASS_PRIEST:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Discipline Spec", GOSSIP_SENDER_MAIN, 0);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Holy Spec", GOSSIP_SENDER_MAIN, 1);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Shadow Spec", GOSSIP_SENDER_MAIN, 2);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_penance:30|t|r Use Discipline Spec", GOSSIP_SENDER_MAIN, 0);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_surgeoflight:30|t|r Use Holy Spec", GOSSIP_SENDER_MAIN, 1);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_shadow_psychichorrors:30|t|r Use Shadow Spec", GOSSIP_SENDER_MAIN, 2);
 			}
 			break;
 		case CLASS_PALADIN:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Holy Spec", GOSSIP_SENDER_MAIN, 3);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Protection Spec", GOSSIP_SENDER_MAIN, 4);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Retribution Spec", GOSSIP_SENDER_MAIN, 5);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_searinglight:30|t|r Use Holy Spec", GOSSIP_SENDER_MAIN, 3);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_blessingofprotection:30|t|r Use Protection Spec", GOSSIP_SENDER_MAIN, 4);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_paladin_divinestorm:30|t|r Use Retribution Spec", GOSSIP_SENDER_MAIN, 5);
 			}
 			break;
 		case CLASS_WARRIOR:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Fury Spec", GOSSIP_SENDER_MAIN, 6);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Arms Spec", GOSSIP_SENDER_MAIN, 7);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Protection Spec", GOSSIP_SENDER_MAIN, 8);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_warrior_titansgrip:30|t|r Use Fury Spec", GOSSIP_SENDER_MAIN, 6);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_warrior_bladestorm:30|t|r Use Arms Spec", GOSSIP_SENDER_MAIN, 7);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_warrior_shieldreflection:30|t|r Use Protection Spec", GOSSIP_SENDER_MAIN, 8);
 			}
 			break;
 		case CLASS_MAGE:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Arcane Spec", GOSSIP_SENDER_MAIN, 9);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Fire Spec", GOSSIP_SENDER_MAIN, 10);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Frost Spec", GOSSIP_SENDER_MAIN, 11);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_mage_arcanebarrage:30|t|r Use Arcane Spec", GOSSIP_SENDER_MAIN, 9);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_mage_livingbomb:30|t|r Use Fire Spec", GOSSIP_SENDER_MAIN, 10);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_mage_deepfreeze:30|t|r Use Frost Spec", GOSSIP_SENDER_MAIN, 11);
 			}
 			break;
 		case CLASS_WARLOCK:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Affliction Spec", GOSSIP_SENDER_MAIN, 12);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Demonology Spec", GOSSIP_SENDER_MAIN, 13);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Destruction Spec", GOSSIP_SENDER_MAIN, 14);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_warlock_haunt:30|t|r Use Affliction Spec", GOSSIP_SENDER_MAIN, 12);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_shadow_demonform:30|t|r Use Demonology Spec", GOSSIP_SENDER_MAIN, 13);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_warlock_chaosbolt:30|t|r Use Destruction Spec", GOSSIP_SENDER_MAIN, 14);
 			}
 			break;
 		case CLASS_SHAMAN:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Elemental Spec", GOSSIP_SENDER_MAIN, 15);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Enhancement Spec", GOSSIP_SENDER_MAIN, 16);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Restoration Spec", GOSSIP_SENDER_MAIN, 17);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_shaman_thunderstorm:30|t|r Use Elemental Spec", GOSSIP_SENDER_MAIN, 15);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_shaman_feralspirit:30|t|r Use Enhancement Spec", GOSSIP_SENDER_MAIN, 16);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_nature_healingwavelesser:30|t|r Use Restoration Spec", GOSSIP_SENDER_MAIN, 17);
 			}
 			break;
 		case CLASS_DRUID:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Ballance Spec", GOSSIP_SENDER_MAIN, 18);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Feral Spec", GOSSIP_SENDER_MAIN, 19);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Restoration Spec", GOSSIP_SENDER_MAIN, 20);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_arcane_starfire:30|t|r Use Ballance Spec", GOSSIP_SENDER_MAIN, 18);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_druid_berserk:30|t|r Use Feral Spec", GOSSIP_SENDER_MAIN, 19);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_druid_flourish:30|t|r Use Restoration Spec", GOSSIP_SENDER_MAIN, 20);
 			}
 			break;
 		case CLASS_HUNTER:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Markmanship Spec", GOSSIP_SENDER_MAIN, 21);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Beastmastery Spec", GOSSIP_SENDER_MAIN, 22);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Survival Spec", GOSSIP_SENDER_MAIN, 23);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_hunter_chimerashot2:30|t|r Use Markmanship Spec", GOSSIP_SENDER_MAIN, 21);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_hunter_animalhandler:30|t|r Use Beastmastery Spec", GOSSIP_SENDER_MAIN, 22);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_golemstormbolt:30|t|r Use Survival Spec", GOSSIP_SENDER_MAIN, 23);
 			}
 			break;
 		case CLASS_ROGUE:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Assasination Spec", GOSSIP_SENDER_MAIN, 24);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Combat Spec", GOSSIP_SENDER_MAIN, 25);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Subtlety Spec", GOSSIP_SENDER_MAIN, 26);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_rogue_disembowel:30|t|r Use Assasination Spec", GOSSIP_SENDER_MAIN, 24);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_rogue_murderspree:30|t|r Use Combat Spec", GOSSIP_SENDER_MAIN, 25);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_rogue_shadowdance:30|t|r Use Subtlety Spec", GOSSIP_SENDER_MAIN, 26);
 			}
 			break;
 		case CLASS_DEATH_KNIGHT:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Blood Spec", GOSSIP_SENDER_MAIN, 27);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Frost Spec", GOSSIP_SENDER_MAIN, 28);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Use Unholy Spec", GOSSIP_SENDER_MAIN, 29);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_deathknight_butcher2:30|t|r Use Blood Spec", GOSSIP_SENDER_MAIN, 27);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_deathknight_empowerruneblade2:30|t|r Use Frost Spec", GOSSIP_SENDER_MAIN, 28);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_hunter_pet_bat:30|t|r Use Unholy Spec", GOSSIP_SENDER_MAIN, 29);
 			}
 			break;
 		}

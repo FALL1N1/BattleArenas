@@ -32,10 +32,7 @@ public:
 			switch (SKILL)
 			{
 			case 1: // Primary Proffs
-				// THIS PART IS USED ONLY ON TOURNAMENT REALM
-				/*if (sWorld->getBoolConfig(REALM_IS_TOURNAMENT_ENABLED))
-				{
-				if (pPlayer->HasItemCount(40752, 5)) // Emblem of Wrathful
+				/*if (pPlayer->HasItemCount(40752, 5)) // Emblem of Wrathful
 				{
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Alchemy (|cff00FF66Unlocked|r)", GOSSIP_SENDER_MAIN, SKILL_ALCHEMY);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Blacksmithing (|cff00FF66Unlocked|r)", GOSSIP_SENDER_MAIN, SKILL_BLACKSMITHING);
@@ -67,8 +64,7 @@ public:
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TALK, "Back to Main Page", GOSSIP_SENDER_MAIN, 5);
 				pPlayer->PlayerTalkClass->SendGossipMenu(60030, _creature->GetGUID());
 				}
-				}
-				else // THIS IS USED ONLY ON FUN RELAM
+				else
 				{*/
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Alchemy", GOSSIP_SENDER_MAIN, SKILL_ALCHEMY);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Blacksmithing", GOSSIP_SENDER_MAIN, SKILL_BLACKSMITHING);
@@ -86,10 +82,7 @@ public:
 				/*}*/
 				break;
 			case 2: // Secondary Proffs
-				// THIS PART IS USED ONLY ON TOURNAMENT REALM
-				/*if (sWorld->getBoolConfig(REALM_IS_TOURNAMENT_ENABLED))
-				{
-				if (pPlayer->HasItemCount(40752, 5))
+				/*if (pPlayer->HasItemCount(40752, 5))
 				{
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Cooking (|cff00FF66Unlocked|r)", GOSSIP_SENDER_MAIN, SKILL_COOKING);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "First Aid (|cff00FF66Unlocked|r)", GOSSIP_SENDER_MAIN, SKILL_FIRST_AID);
@@ -106,7 +99,7 @@ public:
 				pPlayer->PlayerTalkClass->SendGossipMenu(60030, _creature->GetGUID());
 				}
 				}
-				else // THIS PART IS USED ONLY ON FUN REALM
+				else
 				{*/
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Cooking", GOSSIP_SENDER_MAIN, SKILL_COOKING);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "First Aid", GOSSIP_SENDER_MAIN, SKILL_FIRST_AID);
@@ -129,9 +122,8 @@ public:
 					else
 					{
 						CompleteLearnProfession(pPlayer, (SkillType)SKILL);
-						// THIS PART IS USED ONLY ON TOURNAMENT REALM
 						/*if (sWorld->getBoolConfig(REALM_IS_TOURNAMENT_ENABLED))
-						pPlayer->DestroyItemCount(40752, 5, true); // Emblem of Wrathful*/
+						    pPlayer->DestroyItemCount(40752, 5, true); // Emblem of Wrathful*/
 						pPlayer->CLOSE_GOSSIP_MENU();
 					}
 				}

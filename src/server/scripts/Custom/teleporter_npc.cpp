@@ -28,24 +28,23 @@ public:
 		case ALLIANCE:
 			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Stormwind - Mall", GOSSIP_SENDER_MAIN, 2, "Are you sure you want to go to Stormwind Mall?", 0, false);
 			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Ironforge - Mall", GOSSIP_SENDER_MAIN, 9, "Are you sure you want to go to Ironforge Mall?", 0, false);
-			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Gurubashi Arena", GOSSIP_SENDER_MAIN, 17, "Are you sure you want to go to Stranglethorn Vale?", 0, false);
+			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Stranglethorn Vale - PvP", GOSSIP_SENDER_MAIN, 17, "Are you sure you want to go to Stranglethorn Vale?", 0, false);
 			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Goldenmist Village - PvP", GOSSIP_SENDER_MAIN, 43, "Are you sure you want to go to Goldenmist Village?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Elwynn Forest", GOSSIP_SENDER_MAIN, 47, "Are you sure you want to go to Elwynn Forest?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Raid for Orgrimmar", GOSSIP_SENDER_MAIN, 49, "Are you sure you want to go to Durotar? (Need atleast 3 players)", 0, false);
+			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Elwynn Forest", GOSSIP_SENDER_MAIN, 47, "Are you sure you want to go to Elwynn Forest?", 0, false);
+			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Raid for Orgrimmar", GOSSIP_SENDER_MAIN, 49, "Are you sure you want to go to Durotar? (Need atleast 3 players)", 0, false);
 			break;
 		case HORDE:
 			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Orgrimmar - Mall", GOSSIP_SENDER_MAIN, 4, "Are you sure you want to go to Orgrimmar Mall?", 0, false);
 			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Silvermoon - Mall", GOSSIP_SENDER_MAIN, 3, "Are you sure you want to go to Silvermoon Mall?", 0, false);
-			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Gurubashi Arena", GOSSIP_SENDER_MAIN, 17, "Are you sure you want to go to Stranglethorn Vale?", 0, false);
+			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Stranglethorn Vale - PvP", GOSSIP_SENDER_MAIN, 17, "Are you sure you want to go to Stranglethorn Vale?", 0, false);
 			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Goldenmist Village - PvP", GOSSIP_SENDER_MAIN, 44, "Are you sure you want to go to Goldenmist Village?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Durotar", GOSSIP_SENDER_MAIN, 48, "Are you sure you want to go to Durotar?", 0, false);
-			//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Raid for Stormwind", GOSSIP_SENDER_MAIN, 50, "Are you sure you want to go to Durotar? (Need atleast 3 players)", 0, false);
+			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Durotar", GOSSIP_SENDER_MAIN, 48, "Are you sure you want to go to Durotar?", 0, false);
+			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Raid for Stormwind", GOSSIP_SENDER_MAIN, 50, "Are you sure you want to go to Durotar? (Need atleast 3 players)", 0, false);
 			break;
 		}
-
-		//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Dueling Zone", GOSSIP_SENDER_MAIN, 45, "Are you sure you want to go to Dueling Zone?", 0, false);
-		//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Zone: Nagrand Arena", GOSSIP_SENDER_MAIN, 46, "Are you sure you want to go to Nagrand Arena?", 0, false);
-		pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Transmogrify Place", GOSSIP_SENDER_MAIN, 18, "Are you sure you want to go to Transmogrification Place?", 0, false);
+		pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Dueling Zone", GOSSIP_SENDER_MAIN, 45, "Are you sure you want to go to Dueling Zone?", 0, false);
+		pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Ring of Trials (Nagrand Arena)", GOSSIP_SENDER_MAIN, 46, "Are you sure you want to go to Nagrand Arena?", 0, false);
+		pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Transmogrification Place", GOSSIP_SENDER_MAIN, 18, "Are you sure you want to go to Transmogrification Place?", 0, false);
 		pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Professions Place", GOSSIP_SENDER_MAIN, 5, "Are you sure you want to go to Professions Mall?", 0, false);
 		pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Tanaris - Custom Jump Event", GOSSIP_SENDER_MAIN, 7, "Are you sure you want to go to Custom jump event?", 0, false);
 		pPlayer->ADD_GOSSIP_ITEM_EXTENDED(4, "Random Queue Places", GOSSIP_SENDER_MAIN, 16, "Are you sure you want to do this?", 0, false);
@@ -594,6 +593,10 @@ public:
 			pPlayer->TeleportTo(0, -9103.945313f, 407.655640f, 92.646919f, 3.781690f);
 			break;
 
+		case 48: // Durotar
+			pPlayer->TeleportTo(1, 1359.506348f, -4369.427246f, 26.164385f, 3.450796f);
+			break;
+
 		case 49: // Raid for Orgrimmar
 			{
 				if (!group) // If the player isn't in a group, then...
@@ -634,10 +637,6 @@ public:
 					plr->GetSession()->SendPacket(&data);
 				}
 			}
-			break;
-
-		case 48: // Durotar
-			pPlayer->TeleportTo(1, 1359.506348f, -4369.427246f, 26.164385f, 3.450796f);
 			break;
 
 		case 50: // Raid for Stormwind
