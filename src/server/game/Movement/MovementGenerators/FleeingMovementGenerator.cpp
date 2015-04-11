@@ -91,7 +91,7 @@ bool FleeingMovementGenerator<T>::_getPoint(T &owner, float &x, float &y, float 
     float temp_x, temp_y, angle;
     const Map* _map = owner.GetBaseMap();
     // primitive path-finding	
-    for (uint8 i = 0; i < 25; ++i)	
+    for (uint8 i = 0; i <= 26; ++i) // this was for (uint8 i = 0; i < 25; ++i), idk why
     {	
         if (i_only_forward && i > 3)
             break;
@@ -117,7 +117,7 @@ bool FleeingMovementGenerator<T>::_getPoint(T &owner, float &x, float &y, float 
                 break;	
             case 4:	
                 angle = i_cur_angle + static_cast<float>(M_PI/4);	
-                break;	
+                break;
             case 5:	
                 angle = i_cur_angle - static_cast<float>(M_PI/4);	
                 break;	
