@@ -105,27 +105,27 @@ public:
 	//{
 	//	CheckMessage(player, msg, lang, NULL, NULL, NULL, NULL);
 	//}
-	//
+
+	//void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Group* group) // Party
+	//{
+	//	CheckMessage(player, msg, lang, NULL, group, NULL, NULL);
+	//}
+	
+	//void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Guild* guild) // Guild
+	//{
+	//	CheckMessage(player, msg, lang, NULL, NULL, guild, NULL);
+	//}
+	
 	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Player* receiver) // Whisper
 	{
 		// Whispers only to GM is available
-		if (receiver->isGameMaster())
+		if (receiver->GetSession()->GetSecurity() >= 2)
 			return;
 
 		CheckMessage(player, msg, lang, receiver, NULL, NULL, NULL);
 	}
 
-	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Group* group) // Party
-	{
-		CheckMessage(player, msg, lang, NULL, group, NULL, NULL);
-	}
-
-	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Guild* guild) // Guild
-	{
-		CheckMessage(player, msg, lang, NULL, NULL, guild, NULL);
-	}
-
-	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Channel* channel) // LFG
+	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Channel* channel) // LFG and channels
 	{
 		CheckMessage(player, msg, lang, NULL, NULL, NULL, channel);
 	}
@@ -144,9 +144,10 @@ public:
 			uint32 currentTime = 30 - remainingTime;
 
 			msg = "";
-			ChatHandler(player->GetSession()).PSendSysMessage("You need at least 30 minutes playtime to chat.");
-			player->GetSession()->SendAreaTriggerMessage("You need at least 30 minutes playtime to chat.");
-			player->GetSession()->SendAreaTriggerMessage("Your current played time: %u minutes.", currentTime);
+
+			ChatHandler(player->GetSession()).PSendSysMessage("|cffF00000You need at least 30 minutes playtime to use global channels or whispers. Note that you can still whisper to a GMs.");
+			player->GetSession()->SendAreaTriggerMessage("|cffF00000You need at least 30 minutes playtime to use global channels or whispers.");
+			player->GetSession()->SendAreaTriggerMessage("|cffF00000Your current played time: %u minutes.", currentTime);
 			return;
 		}
 	}
