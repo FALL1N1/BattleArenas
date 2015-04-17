@@ -8090,7 +8090,7 @@ void Player::UpdateArea(uint32 newArea)
 	pvpInfo.inNoPvPArea = false;
 
 	// Update PvP Flag for Goldenmist Village - PvP Zone
-	if (GetZoneId() == 3433) // Goldenmist Village - PvP Zone (Ghostlands)
+	if (GetAreaId() == 3433 || GetAreaId() == 3515 || GetAreaId() == 3490) // Goldenmist Village - PvP Zone (Ghostlands)
 		SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP);
 
 	if (area && area->IsSanctuary() ||
