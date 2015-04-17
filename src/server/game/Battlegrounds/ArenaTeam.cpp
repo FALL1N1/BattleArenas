@@ -604,6 +604,10 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
         default:
             break;
     }
+
+	if (type = 10) // Fix console error because of the 10v10 skirmish npc
+		return 0xFF;
+
     sLog->outError("FATAL: Unknown arena team type %u for some arena team", type);
     return 0xFF;
 }
