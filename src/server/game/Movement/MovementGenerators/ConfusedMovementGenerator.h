@@ -40,9 +40,6 @@ class ConfusedMovementGenerator : public MovementGeneratorMedium< T, ConfusedMov
 		void _InitSpecific(T &, bool &, bool &);
         TimeTracker i_nextMoveTime;
         float i_x, i_y, i_z;
-		/*// From old server by Natureknight
-		float i_waypoints[MAX_CONF_WAYPOINTS+1][3];
-        uint32 i_nextMove;*/
 };
 #endif
 

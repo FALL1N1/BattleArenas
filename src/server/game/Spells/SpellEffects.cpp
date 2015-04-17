@@ -630,7 +630,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
 								damage *= doses;
 								damage += int32(player->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * combo);
-								damage *= 1.1f; // Increase envenom dmg by 10% by Natureknight
+								damage *= 1.075f; // Increase envenom dmg by 7.5% by Natureknight
 							}
 
 							// Eviscerate and Envenom Bonus Damage (item set effect)
@@ -670,7 +670,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 				else if (m_spellInfo->SpellFamilyFlags[1] & 0x1)
 				{
 					bool found = false;
-					// check dazed affect (Crashes, just testing fix: https://github.com/TrinityCore/TrinityCore/commit/9559a488771eec4f6ea7826df6ad459ca44fa21f by Natureknight
+					// check dazed affect - Fix crash by Natureknight
 					Unit::AuraEffectList const& decSpeedList = unitTarget->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
 					for (Unit::AuraEffectList::const_iterator iter = decSpeedList.begin(); iter != decSpeedList.end(); ++iter)
 					{

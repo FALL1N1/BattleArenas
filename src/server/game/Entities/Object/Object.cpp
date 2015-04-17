@@ -627,7 +627,7 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask*
 							dynamicFlags &= ~UNIT_DYNFLAG_LOOTABLE;
 					}
 
-					// Fix unit tracking to not being limited to the caster of SPELL_AURA_MOD_STALKED by Natureknight: https://github.com/TrinityCore/TrinityCore/pull/6239
+					// Fix unit tracking to not being limited to the caster of SPELL_AURA_MOD_STALKED
 					if(Unit const* unit = ToUnit())
 						if(!unit->HasAuraTypeWithCaster(SPELL_AURA_MOD_STALKED, target->GetGUID()))
 							dynamicFlags &= ~UNIT_DYNFLAG_TRACK_UNIT;

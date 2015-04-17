@@ -345,7 +345,7 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
     float dist = 2 * moveTimeHalf * speedXY;
 	float max_height = -Movement::computeFallElevation(moveTimeHalf,false,-speedZ);
 
-	// Fix for knockback by Natureknight: https://github.com/Retriman/TrinityCore/commit/8dd4178f8e12f6cdb681a6014ac65a2cb4ae8c40
+	// Fix for knockback by Natureknight
     float angle = _owner->GetAngle(srcX, srcY) + M_PI;	
     float angleplus = angle;   	
     float angleminus = angle;	

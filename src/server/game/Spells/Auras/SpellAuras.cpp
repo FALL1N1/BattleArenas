@@ -1656,7 +1656,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
 			// Fix improved Concentration Aura #2 by Natureknight
              if (GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_AURA)	
                  {	
-				//Fix Crash by Natureknight: https://github.com/TrinityCore/TrinityCore/commit/54bd7d9773c4c35de3a518712a3057fd41a67f71
+				//Fix Crash by Natureknight:
                 if (!target)	
                     break;	
 

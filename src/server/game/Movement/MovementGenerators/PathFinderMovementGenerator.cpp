@@ -628,7 +628,7 @@ NavTerrain PathFinderMovementGenerator::getNavTerrain(float x, float y, float z)
     }
 }
 
-bool PathFinderMovementGenerator::HaveTile(const Vector3& p) const // Fixed crash in GetTileAt by Blindspell: https://github.com/TrinityCore/TrinityCore/commit/8966347a416b9e2fba43bc3ff7043d946cfe10c4
+bool PathFinderMovementGenerator::HaveTile(const Vector3& p) const // Fixed crash in GetTileAt
 {
 	int tx = -1, ty = -1;
     float point[VERTEX_SIZE] = {p.y, p.z, p.x};

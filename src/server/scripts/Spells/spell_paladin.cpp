@@ -440,7 +440,7 @@ class spell_pal_divine_storm_dummy : public SpellScriptLoader
         }
 };
 //INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (642, 'spell_pal_divine_shield');
-//Fixing Divine Shield return message STUNNED while caster is cycloned by Naturekngiht and Blindspell:
+//Fixing Divine Shield return message STUNNED while caster is cycloned
 class spell_pal_divine_shield : public SpellScriptLoader	
 {	
     public:	

@@ -1696,10 +1696,10 @@ void Player::Update(uint32 p_time)
 		if (HasAura(14204) && HasAura(57522))
 			RemoveAura(57522);
 
-		////Remove Mount When Used Dispersion (ShadowForm + Dispersion Mount Exploit)
 		//Dont remove mount on Dispersion used by Natureknight (comment this code:)
-		//if (HasAura(47585) && HasAuraType(SPELL_AURA_MOUNTED))
-		//    RemoveAurasByType(SPELL_AURA_MOUNTED);
+		//Remove Mount When Used Dispersion (ShadowForm + Dispersion Mount Exploit)
+		/*if (HasAura(47585) && HasAuraType(SPELL_AURA_MOUNTED))
+		    RemoveAurasByType(SPELL_AURA_MOUNTED);*/
 
 		if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
 		{
@@ -8096,7 +8096,8 @@ void Player::UpdateArea(uint32 newArea)
 	if (area && area->IsSanctuary() ||
 		GetAreaId() == 2249 || // Dueling Zone (Winterspring)
 		GetAreaId() == 2317 || // South Seas (VIP Island)
-		GetAreaId() == 1196)   // Utgarde Pinnacle (VIP Mall)
+		GetAreaId() == 1196 || // Utgarde Pinnacle (VIP Mall)
+		GetAreaId() == 2837)   // Hunter's pet zone
 	{
 		SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
 		pvpInfo.inNoPvPArea = true;
@@ -12223,7 +12224,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
 
 			if (eslot == EQUIPMENT_SLOT_OFFHAND)
 			{
-				// Do not allow polearm to be equipped in the offhand (rare case for the only 1h polearm 41750) by Natureknight
+				// Do not allow polearm to be equipped in the offhand (rare case for the only 1h polearm 41750)
 				if (type == INVTYPE_WEAPON && pProto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM)
 					return EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT;
 

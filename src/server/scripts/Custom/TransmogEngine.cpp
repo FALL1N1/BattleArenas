@@ -513,8 +513,8 @@ bool TransmogEngine::CheckItem(Player* itemOwner, Item* oldItem, const ItemTempl
         return false;
 
 	// fix chest transmogs bug because of different inventory types (by Natureknight)
-	if(oldInventoryType == INVTYPE_CHEST || oldInventoryType == INVTYPE_BODY || oldInventoryType == INVTYPE_ROBE)
-		if(newInventoryType == INVTYPE_CHEST || newInventoryType == INVTYPE_BODY || newInventoryType == INVTYPE_ROBE)
+	if (oldInventoryType == INVTYPE_CHEST || oldInventoryType == INVTYPE_BODY || oldInventoryType == INVTYPE_ROBE)
+		if (newInventoryType == INVTYPE_CHEST || newInventoryType == INVTYPE_BODY || newInventoryType == INVTYPE_ROBE)
 		    return true;
 
 	if(newInventoryType == INVTYPE_RELIC || oldInventoryType == INVTYPE_RELIC)

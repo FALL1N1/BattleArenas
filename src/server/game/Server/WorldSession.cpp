@@ -508,10 +508,18 @@ void WorldSession::LogoutPlayer(bool Save)
             _player->SaveToDB();
         }
 
-        ///- Leave all channels before player delete...
+        //- Leave all channels before player delete...
         _player->CleanupChannels();
-		///- Fix for players dont leave group when logout or dc-ed by Blindspell: https://github.com/fiveofeight/RebornWoWTC/commit/753c5a37da5908b9fcea044add50ae3a6713a2fe
-		// Just leave it blank lol
+
+		//- Fix for players dont leave group when logout or dc-ed (commented)
+		//- If the player is in a group (or invited), remove him. If the group if then only 1 person, disband the group.
+        //_player->UninviteFromGroup();
+
+        // remove player from the group if he is:
+        // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected)
+        //if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && m_Socket)
+        //    _player->RemoveFromGroup();
+
 
         ///- Send update to group and reset stored max enchanting level
         if (_player->GetGroup())

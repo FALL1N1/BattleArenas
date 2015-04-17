@@ -370,8 +370,7 @@ class Spell
         void SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList);
         void SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, ConditionList* condList, bool isChainHeal);
 
-        /*void prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = NULL);*/ // Old one
-		void prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = NULL, const bool instant = false); //Instant glyphs and enchants by Blindspell
+		void prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = NULL, const bool instant = false);
         void cancel();
         void update(uint32 difftime);
         void cast(bool skipCheck = false);

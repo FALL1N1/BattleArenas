@@ -150,7 +150,6 @@ void CreatureAI::EnterEvadeMode()
         if (Unit* owner = me->GetCharmerOrOwner())
         {
             me->GetMotionMaster()->Clear(false);
-            /*me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);*/
 			// Fix pet to walk on the right side of his owner by Natureknight:
             float angle = me->GetFollowAngle();	
             if (owner->GetTypeId() == TYPEID_PLAYER)	

@@ -350,7 +350,7 @@ public:
 };
 
 //INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (45438, 'spell_mage_ice_block');
-//Fixing Ice Block return message STUNNED while caster is cycloned by Naturekngiht and Blindspell:
+//Fixing Ice Block return message STUNNED while caster is cycloned
 class spell_mage_ice_block : public SpellScriptLoader	
 {	
 public:	

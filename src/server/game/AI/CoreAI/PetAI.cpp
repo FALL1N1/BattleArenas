@@ -105,7 +105,7 @@ void PetAI::UpdateAI(const uint32 diff)
             return;
         }
 		
-		// Fix for pets combat by Natureknight:
+		// Tempoprary Fix for pets combat by Natureknight:
 		if (owner && !owner->isInCombat())
 		   if (me->getVictim()->isInCombat())
 			   owner->SetInCombatState(me);
@@ -158,7 +158,7 @@ void PetAI::UpdateAI(const uint32 diff)
 
             if (spellInfo->IsPositive())
             {
-				//Fix for pet autocast spells such as Furious Howl and Leap by Natureknight: https://github.com/TrinityCore/TrinityCore/commit/7a24a16e0be5c87dade28b6a0cd889ab798701aa
+				//Fix for pet autocast spells such as Furious Howl and Leap by Natureknight
                 if (spellInfo->CanBeUsedInCombat())
                 {
                     // check spell cooldown	

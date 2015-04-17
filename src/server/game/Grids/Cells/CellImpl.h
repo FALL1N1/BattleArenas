@@ -53,7 +53,7 @@ inline CellArea Cell::CalculateCellArea(float x, float y, float radius)
         CellCoord center = Trinity::ComputeCellCoord(x, y).normalize();
         return CellArea(center, center);
     }
-	// Fix for fear by Blindspell:
+
     float x_val_negative = x - radius;
     float y_val_negative = y - radius;
     float x_val_positive = x + radius;

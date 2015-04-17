@@ -3138,7 +3138,7 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
 					InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
 				m_AutoRepeatFirstCast = true;
 			}
-			//Fix for Unrelenting Assault apply on instant cast spells by Natureknight
+			// Fix for Unrelenting Assault apply on instant cast spells by Natureknight
 			if (pSpell->m_spellInfo->CalcCastTime(this) > 0)
 				AddUnitState(UNIT_STATE_CASTING);
 
@@ -7810,7 +7810,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 					if ((*itr)->GetEntry() == 27893)
 					{
 						pPet = *itr;
-						// Dancing Rune Weapon by Blindspell
+						// Dancing Rune Weapon
 						if (getVictim())
 							pPet->SetInCombatWith(getVictim());
 						break;
@@ -7821,7 +7821,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 						uint32 procDmg = damage / 2;
 						pPet->SendSpellNonMeleeDamageLog(pPet->getVictim(), procSpell->Id, procDmg, procSpell->GetSchoolMask(), 0, 0, false, 0, false);
 						pPet->DealDamage(pPet->getVictim(), procDmg, NULL, SPELL_DIRECT_DAMAGE, procSpell->GetSchoolMask(), procSpell, true);
-						//Dancing Rune Weapon by Blindspell
+						// Dancing Rune Weapon 
 						if (procSpell->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && (procSpell->SpellFamilyFlags[EFFECT_0] & 0x1))        // DRW cast disease if spell is Plague Strike or Icy Touch
 							pPet->CastSpell(pPet->getVictim(),55078,true);
 						else if (procSpell->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && (procSpell->SpellFamilyFlags[EFFECT_0] & 0x2))
@@ -8322,7 +8322,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, Sp
 					if (!caster || !damage)
 						return false;
 
-					// Fix combustion by Blindspell
+					// Fix Mage's Combustion
 					Aura * dummy = GetAura(28682);
 
 					if (dummy && dummy->GetStackAmount() > 9 && (procEx & PROC_EX_CRITICAL_HIT))
@@ -8738,7 +8738,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
 			{
 				switch (auraSpellInfo->Id)
 				{
-				case 53709: //Shield of the Templar - silence by Blindspell
+				case 53709: //Shield of the Templar - silence
 				case 53710:
 				case 53711:
 					{
@@ -9361,7 +9361,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
 		// Culling the Herd
 	case 70893:
 		{
-			// Hunter pet spell fix by Blindspell
+			// Hunter pet spell fix
 			// check if we're procced by Claw, Bite or Smack (need to use the spell icon ID to detect it)
 			if (!(procSpell->SpellIconID == 262 || procSpell->SpellIconID == 1680 || procSpell->SpellIconID == 473))
 				return false;
@@ -12588,9 +12588,6 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
 		if (IsOnVehicle(target) || m_vehicle->GetBase()->IsOnVehicle(target))
 			return false;
 
-	//// can't attack invisible (ignore stealth for aoe spells)
-	//if ((!bySpell || !(bySpell->AttributesEx6 & SPELL_ATTR6_CAN_TARGET_INVISIBLE)) && !canSeeOrDetect(target, bySpell && bySpell->IsAffectingArea()))
-	// https://github.com/TrinityCore/TrinityCore/commit/648321e1212c3e2a002df0b4509f2b097a330153 fix target selection for ground based aoe spells by Blindspell:
 	// can't attack invisible (ignore stealth for aoe spells) also if the area being looked at is from a spell use the dynamic object created instead of the casting unit.
 	if ((!bySpell || !(bySpell->AttributesEx6 & SPELL_ATTR6_CAN_TARGET_INVISIBLE)) && (obj ? !obj->canSeeOrDetect(target, bySpell && bySpell->IsAffectingArea()) : !canSeeOrDetect(target, bySpell && bySpell->IsAffectingArea())))
 		return false;
@@ -13180,17 +13177,6 @@ void Unit::setDeathState(DeathState s)
 		// remove aurastates allowing special moves
 		ClearAllReactives();
 		ClearDiminishings();
-		// Default script by Natureknight
-		/*if (IsInWorld())
-		{
-		// Only clear MotionMaster for entities that exists in world
-		// Avoids crashes in the following conditions :
-		//  * Using 'call pet' on dead pets
-		//  * Using 'call stabled pet'
-		//  * Logging in with dead pets
-		GetMotionMaster()->Clear(false);
-		GetMotionMaster()->MoveIdle();
-		}*/
 
 		if (!isPet() || (isPet() && IsInWorld()))
 		{
@@ -13641,8 +13627,8 @@ void Unit::ModSpellCastTime(SpellInfo const* spellProto, int32 & castTime, Spell
 	if (Player* modOwner = GetSpellModOwner())
 		modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CASTING_TIME, castTime, spell);
 
-	//Fix Spellcasting time reduce/increase by Blindspell
-	//Gargoyle benefiting from haste by Natureknight => && (spellProto->SpellFamilyName || spellProto->Id == 51963)
+	// Fix Spellcasting time reduce/increase
+	// Gargoyle benefiting from haste (temporary disabled)
 	if (!(spellProto->Attributes & (SPELL_ATTR0_ABILITY|SPELL_ATTR0_TRADESPELL)) && (spellProto->SpellFamilyName || spellProto->Id == 51963) && ((GetTypeId() == TYPEID_PLAYER && spellProto->SpellFamilyName) || GetTypeId() == TYPEID_UNIT))
 		castTime = int32(float(castTime) * GetFloatValue(UNIT_MOD_CAST_SPEED));
 	else if (spellProto->Attributes & SPELL_ATTR0_REQ_AMMO && !(spellProto->AttributesEx2 & SPELL_ATTR2_AUTOREPEAT_FLAG))

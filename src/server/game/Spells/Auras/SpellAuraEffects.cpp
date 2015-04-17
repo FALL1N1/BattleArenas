@@ -666,7 +666,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         case SPELL_AURA_PERIODIC_ENERGIZE:
             if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_GENERIC)
             {
-                // Replenishment (0.20% from max)  Fixed by Natureknight
+                // Replenishment (0.20% from max) Fixed by Natureknight
                 // Infinite Replenishment
                 if (m_spellInfo->SpellIconID == 3184 && m_spellInfo->SpellVisual[0] == 12495)
                     amount = GetBase()->GetUnitOwner()->GetMaxPower(POWER_MANA) * 20 / 10000;
