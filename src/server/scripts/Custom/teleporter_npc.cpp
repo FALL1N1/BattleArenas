@@ -5,6 +5,7 @@
 //     / /_/ / /_/ / /_/ /_/ /  __/ ___ |/ /  /  __/ / / / /_/ (__  )      //
 //    /_____/\__,_/\__/\__/_/\___/_/  |_/_/   \___/_/ /_/\__,_/____/       //
 //         Developed by Natureknight for BattleArenas.no-ip.org            //
+//                                                                         //
 /////////////////////////////////////////////////////////////////////////////
 
 #include "ScriptPCH.h"
@@ -54,7 +55,7 @@ public:
 		else if (pPlayer->getClass() != CLASS_HUNTER)
 			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Hunter's Tame Pet Zone", GOSSIP_SENDER_MAIN, 42, "Are you sure you want to go to pets zone?", 0, false);
 		pPlayer->ADD_GOSSIP_ITEM(4, "Additional Features", GOSSIP_SENDER_MAIN, 20);
-		pPlayer->SEND_GOSSIP_MENU(60020, pCreature->GetGUID());
+		pPlayer->SEND_GOSSIP_MENU(/*60020*/DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
 		return true;
 	}
 
