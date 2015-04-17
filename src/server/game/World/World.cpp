@@ -79,6 +79,7 @@
 #include "WardenCheckMgr.h"
 #include "Warden.h"
 #include "CalendarMgr.h"
+#include "TemplateNPC.h"
 
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -1792,6 +1793,26 @@ void World::SetInitialWorldSettings()
 	InitRandomBGResetTime();
 
 	LoadCharacterNameData();
+
+	// Load templates for Template NPC #1
+	sLog->outString("Loading Template Talents...");
+	sTemplateNpcMgr->LoadTalentsContainer();
+
+	// Load templates for Template NPC #2
+	sLog->outString("Loading Template Glyphs...");
+	sTemplateNpcMgr->LoadGlyphsContainer();
+
+	// Load templates for Template NPC #3
+	sLog->outString("Loading Template Gear for Humans...");
+	sTemplateNpcMgr->LoadHumanGearContainer();
+
+	// Load templates for Template NPC #4
+	sLog->outString("Loading Template Gear for Alliances...");
+	sTemplateNpcMgr->LoadAllianceGearContainer();
+
+	// Load templates for Template NPC #5
+	sLog->outString("Loading Template Gear for Hordes...");
+	sTemplateNpcMgr->LoadHordeGearContainer();
 
 	// possibly enable db logging; avoid massive startup spam by doing it here.
 	if (sLog->GetLogDBLater())

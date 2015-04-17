@@ -1,11 +1,548 @@
-////////////////////////////////////////////////////////////
-//                                                        //
-//          Developed by @JessiqueBA (ac-web.org)         //
-//                                                        //
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//        ____        __  __  __     ___                                   //
+//       / __ )____ _/ /_/ /_/ /__  /   |  ________  ____  ____ ______     //
+//      / __  / __ `/ __/ __/ / _ \/ /| | / ___/ _ \/ __ \/ __ `/ ___/     //
+//     / /_/ / /_/ / /_/ /_/ /  __/ ___ |/ /  /  __/ / / / /_/ (__  )      //
+//    /_____/\__,_/\__/\__/_/\___/_/  |_/_/   \___/_/ /_/\__,_/____/       //
+//         Developed by Natureknight for BattleArenas.no-ip.org            //
+//                                                                         //
+/////////////////////////////////////////////////////////////////////////////
 
 #include "ScriptPCH.h"
 #include "TemplateNPC.h"
+
+void sTemplateNPC::LearnPlateMailSpells(Player* player)
+{
+	switch (player->getClass())
+	{
+	case CLASS_WARRIOR:
+	case CLASS_PALADIN:
+	case CLASS_DEATH_KNIGHT:
+		player->learnSpell(PLATE_MAIL, true);
+		break;
+	case CLASS_SHAMAN:
+	case CLASS_HUNTER:
+		player->learnSpell(MAIL, true);
+		break;
+	default:
+		break;
+	}
+}
+
+void sTemplateNPC::ApplyBonus(Player* player, Item* item, EnchantmentSlot slot, uint32 bonusEntry)
+{
+	if (!item)
+		return;
+
+	if (!bonusEntry || bonusEntry == 0)
+		return;
+
+	player->ApplyEnchantment(item, slot, false);
+	item->SetEnchantment(slot, bonusEntry, 0, 0);
+	player->ApplyEnchantment(item, slot, true);
+}
+
+void sTemplateNPC::ApplyGlyph(Player* player, uint8 slot, uint32 glyphID)
+{
+	if (GlyphPropertiesEntry const* gp = sGlyphPropertiesStore.LookupEntry(glyphID))
+	{
+		if (uint32 oldGlyph = player->GetGlyph(slot))
+		{
+			player->RemoveAurasDueToSpell(sGlyphPropertiesStore.LookupEntry(oldGlyph)->SpellId);
+			player->SetGlyph(slot, 0);
+		}
+		player->CastSpell(player, gp->SpellId, true);
+		player->SetGlyph(slot, glyphID);
+	}
+}
+
+void sTemplateNPC::LearnTemplateTalents(Player* player)
+{
+	for (TalentContainer::const_iterator itr = m_TalentContainer.begin(); itr != m_TalentContainer.end(); ++itr)
+	{
+		if ((*itr)->playerClass == GetClassString(player).c_str() && (*itr)->playerSpec == sTalentsSpec)
+		{
+			player->learnSpell((*itr)->talentId, false);
+			player->AddTalent((*itr)->talentId, player->GetActiveSpec(), true);
+		}
+	}
+	player->SetFreeTalentPoints(0);
+	player->SendTalentsInfoData(false);
+}
+
+void sTemplateNPC::LearnTemplateGlyphs(Player* player)
+{
+	for (GlyphContainer::const_iterator itr = m_GlyphContainer.begin(); itr != m_GlyphContainer.end(); ++itr)
+	{
+		if ((*itr)->playerClass == GetClassString(player).c_str() && (*itr)->playerSpec == sTalentsSpec)
+			ApplyGlyph(player, (*itr)->slot, (*itr)->glyph);
+	}
+	player->SendTalentsInfoData(false);
+}
+
+void sTemplateNPC::EquipTemplateGear(Player* player)
+{
+	if (player->getRace() == RACE_HUMAN)
+	{
+		for (HumanGearContainer::const_iterator itr = m_HumanGearContainer.begin(); itr != m_HumanGearContainer.end(); ++itr)
+		{
+			if ((*itr)->playerClass == GetClassString(player).c_str() && (*itr)->playerSpec == sTalentsSpec)
+			{
+				player->EquipNewItem((*itr)->pos, (*itr)->itemEntry, true); // Equip the item and apply enchants and gems
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), PERM_ENCHANTMENT_SLOT, (*itr)->enchant);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), SOCK_ENCHANTMENT_SLOT, (*itr)->socket1);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), SOCK_ENCHANTMENT_SLOT_2, (*itr)->socket2);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), SOCK_ENCHANTMENT_SLOT_3, (*itr)->socket3);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), BONUS_ENCHANTMENT_SLOT, (*itr)->bonusEnchant);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), PRISMATIC_ENCHANTMENT_SLOT, (*itr)->prismaticEnchant);
+
+			}
+		}
+	}
+	else if (player->GetTeam() == ALLIANCE && player->getRace() != RACE_HUMAN)
+	{
+		for (AllianceGearContainer::const_iterator itr = m_AllianceGearContainer.begin(); itr != m_AllianceGearContainer.end(); ++itr)
+		{
+			if ((*itr)->playerClass == GetClassString(player).c_str() && (*itr)->playerSpec == sTalentsSpec)
+			{
+				player->EquipNewItem((*itr)->pos, (*itr)->itemEntry, true); // Equip the item and apply enchants and gems
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), PERM_ENCHANTMENT_SLOT, (*itr)->enchant);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), SOCK_ENCHANTMENT_SLOT, (*itr)->socket1);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), SOCK_ENCHANTMENT_SLOT_2, (*itr)->socket2);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), SOCK_ENCHANTMENT_SLOT_3, (*itr)->socket3);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), BONUS_ENCHANTMENT_SLOT, (*itr)->bonusEnchant);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), PRISMATIC_ENCHANTMENT_SLOT, (*itr)->prismaticEnchant);
+
+			}
+		}
+	}
+	else if (player->GetTeam() == HORDE)
+	{
+		for (HordeGearContainer::const_iterator itr = m_HordeGearContainer.begin(); itr != m_HordeGearContainer.end(); ++itr)
+		{
+			if ((*itr)->playerClass == GetClassString(player).c_str() && (*itr)->playerSpec == sTalentsSpec)
+			{
+				player->EquipNewItem((*itr)->pos, (*itr)->itemEntry, true); // Equip the item and apply enchants and gems
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), PERM_ENCHANTMENT_SLOT, (*itr)->enchant);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), SOCK_ENCHANTMENT_SLOT, (*itr)->socket1);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), SOCK_ENCHANTMENT_SLOT_2, (*itr)->socket2);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), SOCK_ENCHANTMENT_SLOT_3, (*itr)->socket3);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), BONUS_ENCHANTMENT_SLOT, (*itr)->bonusEnchant);
+				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), PRISMATIC_ENCHANTMENT_SLOT, (*itr)->prismaticEnchant);
+
+			}
+		}
+	}
+}
+
+void sTemplateNPC::LoadTalentsContainer()
+{
+	for (TalentContainer::const_iterator itr = m_TalentContainer.begin(); itr != m_TalentContainer.end(); ++itr)
+		delete *itr;
+
+	m_TalentContainer.clear();
+
+	uint32 oldMSTime = getMSTime();
+	uint32 count = 0;
+
+	QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec, talentId FROM template_npc_talents;");
+
+	if (!result)
+	{
+		sLog->outString(">> Loaded 0 talent templates. DB table `template_npc_talents` is empty!");
+		sLog->outString();
+		return;
+	}
+
+	do
+	{
+		Field* fields = result->Fetch(); 
+
+		TalentTemplate* pTalent = new TalentTemplate;
+
+		pTalent->playerClass = fields[0].GetString();
+		pTalent->playerSpec = fields[1].GetString();
+		pTalent->talentId = fields[2].GetUInt32(); 
+
+		m_TalentContainer.push_back(pTalent);
+		++count;
+	}
+	while (result->NextRow());
+	sLog->outString(">> Loaded %u talent templates in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
+	sLog->outString();
+}
+
+void sTemplateNPC::LoadGlyphsContainer()
+{
+	for (GlyphContainer::const_iterator itr = m_GlyphContainer.begin(); itr != m_GlyphContainer.end(); ++itr)
+		delete *itr;
+
+	QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec, slot, glyph FROM template_npc_glyphs;");
+
+	uint32 oldMSTime = getMSTime();
+	uint32 count = 0;
+
+	if (!result)
+	{
+		sLog->outString(">> Loaded 0 glyph templates. DB table `template_npc_glyphs` is empty!");
+		sLog->outString();
+		return;
+	}
+
+	do
+	{
+		Field* fields = result->Fetch();
+
+		GlyphTemplate* pGlyph = new GlyphTemplate;
+
+		pGlyph->playerClass = fields[0].GetString();
+		pGlyph->playerSpec = fields[1].GetString();
+		pGlyph->slot = fields[2].GetUInt8();
+		pGlyph->glyph = fields[3].GetUInt32();
+
+		m_GlyphContainer.push_back(pGlyph);
+		++count;
+	}
+	while (result->NextRow());
+	sLog->outString(">> Loaded %u glyph templates in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
+	sLog->outString();
+}
+
+void sTemplateNPC::LoadHumanGearContainer()
+{
+	for (HumanGearContainer::const_iterator itr = m_HumanGearContainer.begin(); itr != m_HumanGearContainer.end(); ++itr)
+		delete *itr;
+
+	QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec, pos, itemEntry, enchant, socket1, socket2, socket3, bonusEnchant, prismaticEnchant FROM template_npc_human;");
+
+	uint32 oldMSTime = getMSTime();
+	uint32 count = 0;
+
+	if (!result)
+	{
+		sLog->outString(">> Loaded 0 'gear templates. DB table `template_npc_human` is empty!");
+		sLog->outString();
+		return;
+	}
+
+	do
+	{
+		Field* fields = result->Fetch();
+
+		HumanGearTemplate* pItem = new HumanGearTemplate;
+
+		pItem->playerClass = fields[0].GetString();
+		pItem->playerSpec = fields[1].GetString();
+		pItem->pos = fields[2].GetUInt8();
+		pItem->itemEntry = fields[3].GetUInt32();
+		pItem->enchant = fields[4].GetUInt32();
+		pItem->socket1 = fields[5].GetUInt32();
+		pItem->socket2 = fields[6].GetUInt32();
+		pItem->socket3 = fields[7].GetUInt32();
+		pItem->bonusEnchant = fields[8].GetUInt32();
+		pItem->prismaticEnchant = fields[9].GetUInt32();
+
+		m_HumanGearContainer.push_back(pItem);
+		++count;
+	}
+	while (result->NextRow());
+	sLog->outString(">> Loaded %u gear templates for Humans in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
+	sLog->outString();
+}
+
+void sTemplateNPC::LoadAllianceGearContainer()
+{
+	for (AllianceGearContainer::const_iterator itr = m_AllianceGearContainer.begin(); itr != m_AllianceGearContainer.end(); ++itr)
+		delete *itr;
+
+	QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec, pos, itemEntry, enchant, socket1, socket2, socket3, bonusEnchant, prismaticEnchant FROM template_npc_alliance;");
+
+	uint32 oldMSTime = getMSTime();
+	uint32 count = 0;
+
+	if (!result)
+	{
+		sLog->outString(">> Loaded 0 'gear templates. DB table `template_npc_alliance` is empty!");
+		sLog->outString();
+		return;
+	}
+
+	do
+	{
+		Field* fields = result->Fetch();
+
+		AllianceGearTemplate* pItem = new AllianceGearTemplate;
+
+		pItem->playerClass = fields[0].GetString();
+		pItem->playerSpec = fields[1].GetString();
+		pItem->pos = fields[2].GetUInt8();
+		pItem->itemEntry = fields[3].GetUInt32();
+		pItem->enchant = fields[4].GetUInt32();
+		pItem->socket1 = fields[5].GetUInt32();
+		pItem->socket2 = fields[6].GetUInt32();
+		pItem->socket3 = fields[7].GetUInt32();
+		pItem->bonusEnchant = fields[8].GetUInt32();
+		pItem->prismaticEnchant = fields[9].GetUInt32();
+
+		m_AllianceGearContainer.push_back(pItem);
+		++count;
+	}
+	while (result->NextRow());
+	sLog->outString(">> Loaded %u gear templates for Alliances in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
+	sLog->outString();
+}
+
+void sTemplateNPC::LoadHordeGearContainer()
+{
+	for (HordeGearContainer::const_iterator itr = m_HordeGearContainer.begin(); itr != m_HordeGearContainer.end(); ++itr)
+		delete *itr;
+
+	QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec, pos, itemEntry, enchant, socket1, socket2, socket3, bonusEnchant, prismaticEnchant FROM template_npc_horde;");
+
+	uint32 oldMSTime = getMSTime();
+	uint32 count = 0;
+
+	if (!result)
+	{
+		sLog->outString(">> Loaded 0 'gear templates. DB table `template_npc_horde` is empty!");
+		sLog->outString();
+		return;
+	}
+
+	do
+	{
+		Field* fields = result->Fetch();
+
+		HordeGearTemplate* pItem = new HordeGearTemplate;
+
+		pItem->playerClass = fields[0].GetString();
+		pItem->playerSpec = fields[1].GetString();
+		pItem->pos = fields[2].GetUInt8();
+		pItem->itemEntry = fields[3].GetUInt32();
+		pItem->enchant = fields[4].GetUInt32();
+		pItem->socket1 = fields[5].GetUInt32();
+		pItem->socket2 = fields[6].GetUInt32();
+		pItem->socket3 = fields[7].GetUInt32();
+		pItem->bonusEnchant = fields[8].GetUInt32();
+		pItem->prismaticEnchant = fields[9].GetUInt32();
+
+		m_HordeGearContainer.push_back(pItem);
+		++count;
+	}
+	while (result->NextRow());
+	sLog->outString(">> Loaded %u gear templates for Hordes in %u ms.", count, GetMSTimeDiffToNow(oldMSTime));
+	sLog->outString();
+}
+
+std::string sTemplateNPC::GetClassString(Player* player)
+{
+	switch (player->getClass())
+	{
+	case CLASS_PRIEST:
+		return "Priest";
+		break;
+	case CLASS_PALADIN:
+		return "Paladin";
+		break;
+	case CLASS_WARRIOR:
+		return "Warrior";
+		break;
+	case CLASS_MAGE:
+		return "Mage";
+		break;
+	case CLASS_WARLOCK:
+		return "Warlock";
+		break;
+	case CLASS_SHAMAN:
+		return "Shaman";
+		break;
+	case CLASS_DRUID:
+		return "Druid";
+		break;
+	case CLASS_HUNTER:
+		return "Hunter";
+		break;
+	case CLASS_ROGUE:
+		return "Rogue";
+		break;
+	case CLASS_DEATH_KNIGHT:
+		return "DeathKnight";
+		break;
+	default:
+		break;
+	}
+	return ""; // Fix warning, this should never happen
+}
+
+bool sTemplateNPC::OverwriteTemplate(Player* player, std::string& playerSpecStr)
+{
+	// Delete old talent and glyph templates before extracting new ones
+	CharacterDatabase.PExecute("DELETE FROM template_npc_talents WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
+	CharacterDatabase.PExecute("DELETE FROM template_npc_glyphs WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
+
+	// Delete old gear templates before extracting new ones
+	if (player->getRace() == RACE_HUMAN)
+	{
+		CharacterDatabase.PExecute("DELETE FROM template_npc_human WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
+		player->GetSession()->SendAreaTriggerMessage("Template successfuly created!");
+		return false;
+	}
+	else if (player->GetTeam() == ALLIANCE && player->getRace() != RACE_HUMAN)
+	{
+		CharacterDatabase.PExecute("DELETE FROM template_npc_alliance WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
+		player->GetSession()->SendAreaTriggerMessage("Template successfuly created!");
+		return false;
+	}
+	else if (player->GetTeam() == HORDE)
+	{                                                                                                        // ????????????? sTemplateNpcMgr here??
+		CharacterDatabase.PExecute("DELETE FROM template_npc_horde WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
+		player->GetSession()->SendAreaTriggerMessage("Template successfuly created!");
+		return false;
+	}
+	return true;
+}
+
+void sTemplateNPC::ExtractGearTemplateToDB(Player* player, std::string& playerSpecStr)
+{
+	for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+	{
+		Item* equippedItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+
+		if (equippedItem)
+		{
+			if (player->getRace() == RACE_HUMAN)
+			{
+				CharacterDatabase.PExecute("INSERT INTO template_npc_human (`playerClass`, `playerSpec`, `pos`, `itemEntry`, `enchant`, `socket1`, `socket2`, `socket3`, `bonusEnchant`, `prismaticEnchant`) VALUES ('%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u');"
+					, GetClassString(player).c_str(), playerSpecStr.c_str(), equippedItem->GetSlot(), equippedItem->GetEntry(), equippedItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT), 
+					equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_2), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3),
+					equippedItem->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(PRISMATIC_ENCHANTMENT_SLOT));
+			}
+			else if (player->GetTeam() == ALLIANCE && player->getRace() != RACE_HUMAN)
+			{
+				CharacterDatabase.PExecute("INSERT INTO template_npc_alliance (`playerClass`, `playerSpec`, `pos`, `itemEntry`, `enchant`, `socket1`, `socket2`, `socket3`, `bonusEnchant`, `prismaticEnchant`) VALUES ('%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u');"
+					, GetClassString(player).c_str(), playerSpecStr.c_str(), equippedItem->GetSlot(), equippedItem->GetEntry(), equippedItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT), 
+					equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_2), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3),
+					equippedItem->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(PRISMATIC_ENCHANTMENT_SLOT));
+			}
+			else if (player->GetTeam() == HORDE)
+			{
+				CharacterDatabase.PExecute("INSERT INTO template_npc_horde (`playerClass`, `playerSpec`, `pos`, `itemEntry`, `enchant`, `socket1`, `socket2`, `socket3`, `bonusEnchant`, `prismaticEnchant`) VALUES ('%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u');"
+					, GetClassString(player).c_str(), playerSpecStr.c_str(), equippedItem->GetSlot(), equippedItem->GetEntry(), equippedItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT), 
+					equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_2), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3),
+					equippedItem->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(PRISMATIC_ENCHANTMENT_SLOT));
+			}
+		}
+	}
+}
+
+void sTemplateNPC::ExtractTalentTemplateToDB(Player* player, std::string& playerSpecStr)
+{
+	QueryResult result = CharacterDatabase.PQuery("SELECT spell FROM character_talent WHERE guid = '%u' "
+		"AND spec = '%u';", player->GetGUID(), player->GetActiveSpec());
+
+	if (!result)
+	{
+		return;
+	}
+	else if (player->GetFreeTalentPoints() > 0)
+	{
+		player->GetSession()->SendAreaTriggerMessage("You have unspend talent points. Please spend all your talent points and re-extract the template.");
+		return;
+	}
+	else
+	{
+		do
+		{
+			Field* fields = result->Fetch(); 
+			uint32 spell = fields[0].GetUInt32();
+
+			CharacterDatabase.PExecute("INSERT INTO template_npc_talents (playerClass, playerSpec, talentId) "
+				"VALUES ('%s', '%s', '%u');", GetClassString(player).c_str(), playerSpecStr.c_str(), spell);
+		}
+		while (result->NextRow());
+	}
+}
+
+void sTemplateNPC::ExtractGlyphsTemplateToDB(Player* player, std::string& playerSpecStr)
+{
+	QueryResult result = CharacterDatabase.PQuery("SELECT glyph1, glyph2, glyph3, glyph4, glyph5, glyph6 "
+		"FROM character_glyphs WHERE guid = '%u' AND spec = '%u';", player->GetGUID(), player->GetActiveSpec());
+
+	for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
+	{
+		if (!result)
+		{ 
+			player->GetSession()->SendAreaTriggerMessage("Get glyphs and re-extract the template!");
+			continue;
+		}
+
+		Field* fields = result->Fetch();
+		uint32 glyph1 = fields[0].GetUInt32();
+		uint32 glyph2 = fields[1].GetUInt32();
+		uint32 glyph3 = fields[2].GetUInt32();
+		uint32 glyph4 = fields[3].GetUInt32();
+		uint32 glyph5 = fields[4].GetUInt32();
+		uint32 glyph6 = fields[5].GetUInt32();
+
+		uint32 storedGlyph;
+
+		switch (slot)
+		{
+		case 0:
+			storedGlyph = glyph1;
+			break;
+		case 1:
+			storedGlyph = glyph2;
+			break;
+		case 2:
+			storedGlyph = glyph3;
+			break;
+		case 3:
+			storedGlyph = glyph4;
+			break;
+		case 4:
+			storedGlyph = glyph5;
+			break;
+		case 5:
+			storedGlyph = glyph6;
+			break;
+		default:
+			break;
+		}
+
+		CharacterDatabase.PExecute("INSERT INTO template_npc_glyphs (playerClass, playerSpec, slot, glyph) "
+			"VALUES ('%s', '%s', '%u', '%u');", GetClassString(player).c_str(), playerSpecStr.c_str(), slot, storedGlyph);
+	}
+}
+
+bool sTemplateNPC::CanEquipTemplate(Player* player, std::string& playerSpecStr)
+{
+	if (player->getRace() == RACE_HUMAN)
+	{
+		QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec FROM template_npc_human "
+			"WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
+
+		if (!result)
+			return false;
+	}
+	else if (player->GetTeam() == ALLIANCE && player->getRace() != RACE_HUMAN)
+	{
+		QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec FROM template_npc_alliance "
+			"WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
+
+		if (!result)
+			return false;
+	}
+	else if (player->GetTeam() == HORDE)
+	{
+		QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec FROM template_npc_horde "
+			"WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
+
+		if (!result)
+			return false;
+	}
+	return true;
+}
 
 class TemplateNPC_Commands : public CommandScript
 {
@@ -117,12 +654,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a priest!");
 			return false;
 		}
-		spec = "Discipline";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Discipline";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -135,12 +672,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a priest!");
 			return false;
 		}
-		spec = "Shadow";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Shadow";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -153,12 +690,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a priest!");
 			return false;
 		}
-		spec = "Holy";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Holy";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -171,12 +708,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a paladin!");
 			return false;
 		}
-		spec = "Holy";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Holy";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -189,12 +726,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a paladin!");
 			return false;
 		}
-		spec = "Protection";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Protection";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -207,12 +744,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a paladin!");
 			return false;
 		}
-		spec = "Retribution";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Retribution";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -225,12 +762,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a warrior!");
 			return false;
 		}
-		spec = "Fury";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Fury";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -243,12 +780,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a warrior!");
 			return false;
 		}
-		spec = "Arms";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Arms";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -261,12 +798,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a warrior!");
 			return false;
 		}
-		spec = "Protection";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Protection";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -279,12 +816,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a mage!");
 			return false;
 		}
-		spec = "Arcane";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Arcane";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -297,12 +834,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a mage!");
 			return false;
 		}
-		spec = "Fire";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Fire";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -315,12 +852,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a mage!");
 			return false;
 		}
-		spec = "Frost";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Frost";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -333,12 +870,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a warlock!");
 			return false;
 		}
-		spec = "Affliction";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Affliction";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -351,12 +888,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a warlock!");
 			return false;
 		}
-		spec = "Demonology";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Demonology";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -369,12 +906,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a warlock!");
 			return false;
 		}
-		spec = "Destruction";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Destruction";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -387,12 +924,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a shaman!");
 			return false;
 		}
-		spec = "Elemental";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Elemental";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -405,12 +942,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a shaman!");
 			return false;
 		}
-		spec = "Enhancement";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Enhancement";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -423,12 +960,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a shaman!");
 			return false;
 		}
-		spec = "Restoration";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Restoration";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -441,12 +978,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a druid!");
 			return false;
 		}
-		spec = "Ballance";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Ballance";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -459,12 +996,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a druid!");
 			return false;
 		}
-		spec = "Feral";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Feral";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -477,12 +1014,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a druid!");
 			return false;
 		}
-		spec = "Restoration";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Restoration";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -495,12 +1032,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a hunter!");
 			return false;
 		}
-		spec = "Marksmanship";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Marksmanship";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -513,12 +1050,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a hunter!");
 			return false;
 		}
-		spec = "Beastmastery";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Beastmastery";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -531,12 +1068,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a hunter!");
 			return false;
 		}
-		spec = "Survival";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Survival";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -549,12 +1086,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a rogue!");
 			return false;
 		}
-		spec = "Assassination";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Assassination";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -567,12 +1104,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a rogue!");
 			return false;
 		}
-		spec = "Combat";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Combat";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -585,12 +1122,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a rogue!");
 			return false;
 		}
-		spec = "Subtlety";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Subtlety";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -603,12 +1140,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a death knight!");
 			return false;
 		}
-		spec = "Blood";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->sTalentsSpec = "Blood";
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -621,12 +1158,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a death knight!");
 			return false;
 		}
-		spec = "Frost";
+		sTemplateNpcMgr->sTalentsSpec = "Frost";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 
@@ -639,12 +1176,12 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("You're not a death knight!");
 			return false;
 		}
-		spec = "Unholy";
+		sTemplateNpcMgr->sTalentsSpec = "Unholy";
 		player->SaveToDB();
-		OverwriteTemplate(player, spec);
-		ExtractGearTemplateToDB(player, spec);
-		ExtractTalentTemplateToDB(player, spec);
-		ExtractGlyphsTemplateToDB(player, spec);
+		sTemplateNpcMgr->OverwriteTemplate(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGearTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractTalentTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
+		sTemplateNpcMgr->ExtractGlyphsTemplateToDB(player, sTemplateNpcMgr->sTalentsSpec);
 		return true;
 	}
 };
@@ -654,267 +1191,78 @@ class TemplateNPC : public CreatureScript
 public:
 	TemplateNPC() : CreatureScript("TemplateNPC") { }
 
-	void ApplyGlyph(Player* player, uint8 slot, uint32 glyphID)
-	{
-		if (GlyphPropertiesEntry const* gp = sGlyphPropertiesStore.LookupEntry(glyphID))
-		{
-			if (uint32 oldGlyph = player->GetGlyph(slot))
-			{
-				player->RemoveAurasDueToSpell(sGlyphPropertiesStore.LookupEntry(oldGlyph)->SpellId);
-				player->SetGlyph(slot, 0);
-			}
-
-			player->CastSpell(player, gp->SpellId, true);
-			player->SetGlyph(slot, glyphID);
-		}
-	}
-
-	void SetTemplateGlyphs(Player* player, std::string& playerSpecStr)
-	{
-		for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
-		{
-			QueryResult result = CharacterDatabase.PQuery("SELECT glyph FROM template_npc_glyphs "
-				"WHERE playerClass = '%s' AND playerSpec = '%s' AND slot = '%u';", GetClassString(player).c_str(), playerSpecStr.c_str(), slot);
-
-			if (!result)
-				continue;
-
-			Field* fields = result->Fetch();
-			uint32 glyph = fields[0].GetUInt32();
-
-			ApplyGlyph(player, slot, glyph);
-		}
-		player->SendTalentsInfoData(false);
-	}
-
-	void SetTemplateTalents(Player* player, std::string& playerSpecStr)
-	{
-		QueryResult select = CharacterDatabase.PQuery("SELECT talentId FROM template_npc_talents WHERE playerClass = '%s' AND "
-			"playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
-
-		if (!select)
-		{ 
-			return;
-		}
-		else
-		{
-			do
-			{
-				Field* fields = select->Fetch(); 
-				uint32 talentId = fields[0].GetUInt32(); 
-
-				player->learnSpell(talentId, false);
-				player->AddTalent(talentId, player->GetActiveSpec(), true);
-			}
-			while (select->NextRow());
-			player->SetFreeTalentPoints(0);
-			player->SendTalentsInfoData(false);
-		}
-	}
-
-	void ApplyBonus(Player* player, Item* item, EnchantmentSlot slot, uint32 bonusEntry)
-	{
-		if (!item)
-			return;
-
-		if (!bonusEntry || bonusEntry == 0)
-			return;
-
-		player->ApplyEnchantment(item, slot, false);
-		item->SetEnchantment(slot, bonusEntry, 0, 0);
-		player->ApplyEnchantment(item, slot, true);
-	}
-
-	void EquipTmpGear(Player* player, std::string& playerSpecStr)
-	{
-		if (player->getRace() == RACE_HUMAN)
-		{
-			for (uint8 equipmentSlot = EQUIPMENT_SLOT_START; equipmentSlot < EQUIPMENT_SLOT_END; ++equipmentSlot)
-			{
-				QueryResult result = CharacterDatabase.PQuery("SELECT itemEntry, enchant, socket1, socket2, socket3, bonusEnchant, prismaticEnchant "
-					"FROM template_npc_human WHERE playerClass = '%s' AND playerSpec = '%s' AND pos = '%u';", GetClassString(player).c_str(), playerSpecStr.c_str(), equipmentSlot);
-
-				if (!result)
-					continue;
-
-				Field* fields = result->Fetch(); 
-				uint32 itemEntry = fields[0].GetUInt32(); 
-				uint32 enchant = fields[1].GetUInt32(); 
-				uint32 socket1 = fields[2].GetUInt32(); 
-				uint32 socket2 = fields[3].GetUInt32(); 
-				uint32 socket3 = fields[4].GetUInt32(); 
-				uint32 bonusEnchant = fields[5].GetUInt32(); 
-				uint32 prismaticEnchant = fields[6].GetUInt32();
-
-				// Equip Gear
-				player->EquipNewItem(equipmentSlot, itemEntry, true);
-
-				// Apply Enchants and Gems
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), PERM_ENCHANTMENT_SLOT, enchant);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), SOCK_ENCHANTMENT_SLOT, socket1);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), SOCK_ENCHANTMENT_SLOT_2, socket2);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), SOCK_ENCHANTMENT_SLOT_3, socket3);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), BONUS_ENCHANTMENT_SLOT, bonusEnchant);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), PRISMATIC_ENCHANTMENT_SLOT, prismaticEnchant);
-			}
-		}
-		else if (player->GetTeam() == ALLIANCE && player->getRace() != RACE_HUMAN)
-		{
-			for (uint8 equipmentSlot = EQUIPMENT_SLOT_START; equipmentSlot < EQUIPMENT_SLOT_END; ++equipmentSlot)
-			{
-				QueryResult result = CharacterDatabase.PQuery("SELECT itemEntry, enchant, socket1, socket2, socket3, bonusEnchant, prismaticEnchant "
-					"FROM template_npc_alliance WHERE playerClass = '%s' AND playerSpec = '%s' AND pos = '%u';", GetClassString(player).c_str(), playerSpecStr.c_str(), equipmentSlot);
-
-				if (!result)
-					continue;
-
-				Field* fields = result->Fetch(); 
-				uint32 itemEntry = fields[0].GetUInt32(); 
-				uint32 enchant = fields[1].GetUInt32(); 
-				uint32 socket1 = fields[2].GetUInt32(); 
-				uint32 socket2 = fields[3].GetUInt32(); 
-				uint32 socket3 = fields[4].GetUInt32(); 
-				uint32 bonusEnchant = fields[5].GetUInt32(); 
-				uint32 prismaticEnchant = fields[6].GetUInt32();
-
-				// Equip Gear
-				player->EquipNewItem(equipmentSlot, itemEntry, true);
-
-				// Apply Enchants and Gems
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), PERM_ENCHANTMENT_SLOT, enchant);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), SOCK_ENCHANTMENT_SLOT, socket1);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), SOCK_ENCHANTMENT_SLOT_2, socket2);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), SOCK_ENCHANTMENT_SLOT_3, socket3);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), BONUS_ENCHANTMENT_SLOT, bonusEnchant);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), PRISMATIC_ENCHANTMENT_SLOT, prismaticEnchant);
-			}
-		}
-		else if (player->GetTeam() == HORDE)
-		{
-			for (uint8 equipmentSlot = EQUIPMENT_SLOT_START; equipmentSlot < EQUIPMENT_SLOT_END; ++equipmentSlot)
-			{
-				QueryResult result = CharacterDatabase.PQuery("SELECT itemEntry, enchant, socket1, socket2, socket3, bonusEnchant, prismaticEnchant "
-					"FROM template_npc_horde WHERE playerClass = '%s' AND playerSpec = '%s' AND pos = '%u';", GetClassString(player).c_str(), playerSpecStr.c_str(), equipmentSlot);
-
-				if (!result)
-					continue;
-
-				Field* fields = result->Fetch(); 
-				uint32 itemEntry = fields[0].GetUInt32(); 
-				uint32 enchant = fields[1].GetUInt32(); 
-				uint32 socket1 = fields[2].GetUInt32(); 
-				uint32 socket2 = fields[3].GetUInt32(); 
-				uint32 socket3 = fields[4].GetUInt32(); 
-				uint32 bonusEnchant = fields[5].GetUInt32(); 
-				uint32 prismaticEnchant = fields[6].GetUInt32();
-
-				// Equip Gear
-				player->EquipNewItem(equipmentSlot, itemEntry, true);
-
-				// Apply Enchants and Gems
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), PERM_ENCHANTMENT_SLOT, enchant);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), SOCK_ENCHANTMENT_SLOT, socket1);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), SOCK_ENCHANTMENT_SLOT_2, socket2);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), SOCK_ENCHANTMENT_SLOT_3, socket3);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), BONUS_ENCHANTMENT_SLOT, bonusEnchant);
-				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipmentSlot), PRISMATIC_ENCHANTMENT_SLOT, prismaticEnchant);
-			}
-		}
-	}
-
-	void LearnPlateMailSpells(Player* player)
-	{
-		switch (player->getClass())
-		{
-		case CLASS_WARRIOR:
-		case CLASS_PALADIN:
-		case CLASS_DEATH_KNIGHT:
-			player->learnSpell(PLATE_MAIL, true);
-			break;
-		case CLASS_SHAMAN:
-		case CLASS_HUNTER:
-			player->learnSpell(MAIL, true);
-			break;
-		default:
-			break;
-		}
-	}
-
 	bool OnGossipHello(Player* player, Creature* creature)
 	{
-		// Icons:
-		// |cff00ff00|TInterface\\icons\\ICON_NAME_HERE:30|t|r <text>
-
 		switch (player->getClass())
 		{
 		case CLASS_PRIEST:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_penance:30|t|r Use Discipline Spec", GOSSIP_SENDER_MAIN, 0);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_surgeoflight:30|t|r Use Holy Spec", GOSSIP_SENDER_MAIN, 1);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_shadow_psychichorrors:30|t|r Use Shadow Spec", GOSSIP_SENDER_MAIN, 2);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_wordfortitude:30|t|r Use Discipline Spec", GOSSIP_SENDER_MAIN, 0);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_holybolt:30|t|r Use Holy Spec", GOSSIP_SENDER_MAIN, 1);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_shadow_shadowwordpain:30|t|r Use Shadow Spec", GOSSIP_SENDER_MAIN, 2);
 			}
 			break;
 		case CLASS_PALADIN:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_searinglight:30|t|r Use Holy Spec", GOSSIP_SENDER_MAIN, 3);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_blessingofprotection:30|t|r Use Protection Spec", GOSSIP_SENDER_MAIN, 4);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_paladin_divinestorm:30|t|r Use Retribution Spec", GOSSIP_SENDER_MAIN, 5);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_holybolt:30|t|r Use Holy Spec", GOSSIP_SENDER_MAIN, 3);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_devotionaura:30|t|r Use Protection Spec", GOSSIP_SENDER_MAIN, 4);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_auraoflight:30|t|r Use Retribution Spec", GOSSIP_SENDER_MAIN, 5);
 			}
 			break;
 		case CLASS_WARRIOR:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_warrior_titansgrip:30|t|r Use Fury Spec", GOSSIP_SENDER_MAIN, 6);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_warrior_bladestorm:30|t|r Use Arms Spec", GOSSIP_SENDER_MAIN, 7);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_warrior_shieldreflection:30|t|r Use Protection Spec", GOSSIP_SENDER_MAIN, 8);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_warrior_innerrage:30|t|r Use Fury Spec", GOSSIP_SENDER_MAIN, 6);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_rogue_eviscerate:30|t|r Use Arms Spec", GOSSIP_SENDER_MAIN, 7);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_warrior_defensivestance:30|t|r Use Protection Spec", GOSSIP_SENDER_MAIN, 8);
 			}
 			break;
 		case CLASS_MAGE:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_mage_arcanebarrage:30|t|r Use Arcane Spec", GOSSIP_SENDER_MAIN, 9);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_mage_livingbomb:30|t|r Use Fire Spec", GOSSIP_SENDER_MAIN, 10);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_mage_deepfreeze:30|t|r Use Frost Spec", GOSSIP_SENDER_MAIN, 11);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_holy_magicalsentry:30|t|r Use Arcane Spec", GOSSIP_SENDER_MAIN, 9);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_fire_flamebolt:30|t|r Use Fire Spec", GOSSIP_SENDER_MAIN, 10);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_frost_frostbolt02:30|t|r Use Frost Spec", GOSSIP_SENDER_MAIN, 11);
 			}
 			break;
 		case CLASS_WARLOCK:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_warlock_haunt:30|t|r Use Affliction Spec", GOSSIP_SENDER_MAIN, 12);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_shadow_demonform:30|t|r Use Demonology Spec", GOSSIP_SENDER_MAIN, 13);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_warlock_chaosbolt:30|t|r Use Destruction Spec", GOSSIP_SENDER_MAIN, 14);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_shadow_deathcoil:30|t|r Use Affliction Spec", GOSSIP_SENDER_MAIN, 12);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_shadow_metamorphosis:30|t|r Use Demonology Spec", GOSSIP_SENDER_MAIN, 13);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_shadow_rainoffire:30|t|r Use Destruction Spec", GOSSIP_SENDER_MAIN, 14);
 			}
 			break;
 		case CLASS_SHAMAN:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_shaman_thunderstorm:30|t|r Use Elemental Spec", GOSSIP_SENDER_MAIN, 15);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_shaman_feralspirit:30|t|r Use Enhancement Spec", GOSSIP_SENDER_MAIN, 16);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_nature_healingwavelesser:30|t|r Use Restoration Spec", GOSSIP_SENDER_MAIN, 17);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_nature_lightning:30|t|r Use Elemental Spec", GOSSIP_SENDER_MAIN, 15);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_nature_lightningshield:30|t|r Use Enhancement Spec", GOSSIP_SENDER_MAIN, 16);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_nature_magicimmunity:30|t|r Use Restoration Spec", GOSSIP_SENDER_MAIN, 17);
 			}
 			break;
 		case CLASS_DRUID:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_arcane_starfire:30|t|r Use Ballance Spec", GOSSIP_SENDER_MAIN, 18);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_druid_berserk:30|t|r Use Feral Spec", GOSSIP_SENDER_MAIN, 19);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_druid_flourish:30|t|r Use Restoration Spec", GOSSIP_SENDER_MAIN, 20);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_nature_starfall:30|t|r Use Ballance Spec", GOSSIP_SENDER_MAIN, 18);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_racial_bearform:30|t|r Use Feral Spec", GOSSIP_SENDER_MAIN, 19);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_nature_healingtouch:30|t|r Use Restoration Spec", GOSSIP_SENDER_MAIN, 20);
 			}
 			break;
 		case CLASS_HUNTER:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_hunter_chimerashot2:30|t|r Use Markmanship Spec", GOSSIP_SENDER_MAIN, 21);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_hunter_animalhandler:30|t|r Use Beastmastery Spec", GOSSIP_SENDER_MAIN, 22);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_golemstormbolt:30|t|r Use Survival Spec", GOSSIP_SENDER_MAIN, 23);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_marksmanship:30|t|r Use Markmanship Spec", GOSSIP_SENDER_MAIN, 21);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_hunter_beasttaming:30|t|r Use Beastmastery Spec", GOSSIP_SENDER_MAIN, 22);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_Hunter_swiftstrike:30|t|r Use Survival Spec", GOSSIP_SENDER_MAIN, 23);
 			}
 			break;
 		case CLASS_ROGUE:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_rogue_disembowel:30|t|r Use Assasination Spec", GOSSIP_SENDER_MAIN, 24);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_rogue_murderspree:30|t|r Use Combat Spec", GOSSIP_SENDER_MAIN, 25);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_rogue_shadowdance:30|t|r Use Subtlety Spec", GOSSIP_SENDER_MAIN, 26);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_rogue_eviscerate:30|t|r Use Assasination Spec", GOSSIP_SENDER_MAIN, 24);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_backstab:30|t|r Use Combat Spec", GOSSIP_SENDER_MAIN, 25);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_stealth:30|t|r Use Subtlety Spec", GOSSIP_SENDER_MAIN, 26);
 			}
 			break;
 		case CLASS_DEATH_KNIGHT:
 			{
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_deathknight_butcher2:30|t|r Use Blood Spec", GOSSIP_SENDER_MAIN, 27);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_deathknight_empowerruneblade2:30|t|r Use Frost Spec", GOSSIP_SENDER_MAIN, 28);
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\ability_hunter_pet_bat:30|t|r Use Unholy Spec", GOSSIP_SENDER_MAIN, 29);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_deathknight_bloodpresence:30|t|r Use Blood Spec", GOSSIP_SENDER_MAIN, 27);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_deathknight_frostpresence:30|t|r Use Frost Spec", GOSSIP_SENDER_MAIN, 28);
+				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|cff00ff00|TInterface\\icons\\spell_deathknight_unholypresence:30|t|r Use Unholy Spec", GOSSIP_SENDER_MAIN, 29);
 			}
 			break;
 		}
@@ -924,28 +1272,11 @@ public:
 
 	void EquipFullTemplateGear(Player* player, std::string& playerSpecStr) // Merge
 	{
-		if (CanEquipTemplate(player, playerSpecStr) == false)
+		if (sTemplateNpcMgr->CanEquipTemplate(player, playerSpecStr) == false)
 		{
 			player->GetSession()->SendAreaTriggerMessage("There's no templates for %s specialization yet.", playerSpecStr.c_str());
 			return;
 		}
-
-		EquipTmpGear(player, playerSpecStr);
-		SetTemplateTalents(player, playerSpecStr);
-		SetTemplateGlyphs(player, playerSpecStr);
-
-		LearnPlateMailSpells(player);
-		LearnWeaponSkills(player);
-
-		player->GetSession()->SendAreaTriggerMessage("Successfuly equipped %s %s template!", playerSpecStr.c_str(), GetClassString(player).c_str());
-	}
-
-	bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
-	{
-		player->PlayerTalkClass->ClearMenus();
-
-		if (!player || !creature)
-			return true;
 
 		// Don't let players to use Template feature while wearing some gear
 		for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
@@ -956,7 +1287,7 @@ public:
 				{
 					player->GetSession()->SendAreaTriggerMessage("You need to remove all your equipped items in order to use this feature!");
 					player->CLOSE_GOSSIP_MENU();
-					return true;
+					return;
 				}
 			}
 		}
@@ -966,194 +1297,212 @@ public:
 		{
 			player->GetSession()->SendAreaTriggerMessage("You have already spent some talent points. You need to reset your talents first!");
 			player->CLOSE_GOSSIP_MENU();
-			return true;
+			return;
 		}
+
+		sTemplateNpcMgr->LearnTemplateTalents(player);
+		sTemplateNpcMgr->LearnTemplateGlyphs(player);
+		sTemplateNpcMgr->EquipTemplateGear(player);
+		sTemplateNpcMgr->LearnPlateMailSpells(player);
+
+		LearnWeaponSkills(player);
+
+		player->GetSession()->SendAreaTriggerMessage("Successfuly equipped %s %s template!", playerSpecStr.c_str(), sTemplateNpcMgr->GetClassString(player).c_str());
+	}
+
+	bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+	{
+		player->PlayerTalkClass->ClearMenus();
+
+		if (!player || !creature)
+			return true;
 
 		switch (uiAction)
 		{
 		case 0: // Use Discipline Priest Spec
-			spec = "Discipline";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Discipline";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 1: // Use Holy Priest Spec
-			spec = "Holy";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Holy";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 2: // Use Shadow Priest Spec
-			spec = "Shadow";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Shadow";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 3: // Use Holy Paladin Spec
-			spec = "Holy";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Holy";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 4: // Use Protection Paladin Spec
-			spec = "Protection";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Protection";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 5: // Use Retribution Paladin Spec
-			spec = "Retribution";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Retribution";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 6: // Use Fury Warrior Spec
-			spec = "Fury";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Fury";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 7: // Use Arms Warrior Spec
-			spec = "Arms";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Arms";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 8: // Use Protection Warrior Spec
-			spec = "Protection";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Protection";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 9: // Use Arcane Mage Spec
-			spec = "Arcane";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Arcane";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 10: // Use Fire Mage Spec
-			spec = "Fire";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Fire";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 11: // Use Frost Mage Spec
-			spec = "Frost";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Frost";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 12: // Use Affliction Warlock Spec
-			spec = "Affliction";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Affliction";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 13: // Use Demonology Warlock Spec
-			spec = "Demonology";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Demonology";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 14: // Use Destruction Warlock Spec
-			spec = "Destruction";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Destruction";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 15: // Use Elemental Shaman Spec
-			spec = "Elemental";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Elemental";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 16: // Use Enhancement Shaman Spec
-			spec = "Enhancement";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Enhancement";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 17: // Use Restoration Shaman Spec
-			spec = "Restoration";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Restoration";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 18: // Use Ballance Druid Spec
-			spec = "Ballance";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Ballance";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 19: // Use Feral Druid Spec
-			spec = "Feral";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Feral";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 20: // Use Restoration Druid Spec
-			spec = "Restoration";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Restoration";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 21: // Use Marksmanship Hunter Spec
-			spec = "Marksmanship";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Marksmanship";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 22: // Use Beastmastery Hunter Spec
-			spec = "Beastmastery";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Beastmastery";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 23: // Use Survival Hunter Spec
-			spec = "Survival";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Survival";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 24: // Use Assassination Rogue Spec
-			spec = "Assassination";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Assassination";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 25: // Use Combat Rogue Spec
-			spec = "Combat";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Combat";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 26: // Use Subtlety Rogue Spec
-			spec = "Subtlety";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Subtlety";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 27: // Use Blood DK Spec
-			spec = "Blood";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Blood";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 28: // Use Frost DK Spec
-			spec = "Frost";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Frost";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 
 		case 29: // Use Unholy DK Spec
-			spec = "Unholy";
-			EquipFullTemplateGear(player, spec);
+			sTemplateNpcMgr->sTalentsSpec = "Unholy";
+			EquipFullTemplateGear(player, sTemplateNpcMgr->sTalentsSpec);
 			player->CLOSE_GOSSIP_MENU();
 			break;
 		default: // Just in case
 			player->GetSession()->SendAreaTriggerMessage("Something went wrong in the code. Please contact the administrator.");
 			break;
 		}
+		player->UpdateSkillsForLevel();
 		return true;
 	}
 };

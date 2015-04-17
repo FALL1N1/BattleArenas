@@ -1,13 +1,19 @@
-////////////////////////////////////////////////////////////
-//                                                        //
-//          Developed by @JessiqueBA (ac-web.org)         //
-//                                                        //
-////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//        ____        __  __  __     ___                                   //
+//       / __ )____ _/ /_/ /_/ /__  /   |  ________  ____  ____ ______     //
+//      / __  / __ `/ __/ __/ / _ \/ /| | / ___/ _ \/ __ \/ __ `/ ___/     //
+//     / /_/ / /_/ / /_/ /_/ /  __/ ___ |/ /  /  __/ / / / /_/ (__  )      //
+//    /_____/\__,_/\__/\__/_/\___/_/  |_/_/   \___/_/ /_/\__,_/____/       //
+//         Developed by Natureknight for BattleArenas.no-ip.org            //
+//                                                                         //
+/////////////////////////////////////////////////////////////////////////////
 
 #ifndef TALENT_FUNCTIONS_H
 #define TALENT_FUNCTIONS_H
 
-std::string spec;
+#include "Define.h"
+#include <ace/Singleton.h>
+#include <ace/Thread_Mutex.h>
 
 enum templateSpells
 {
@@ -152,214 +158,104 @@ static void LearnWeaponSkills(Player* player)
 	}
 }
 
-std::string GetClassString(Player* player)
+struct TalentTemplate
 {
-	switch (player->getClass())
-	{
-	case CLASS_PRIEST:
-		return "Priest";
-		break;
-	case CLASS_PALADIN:
-		return "Paladin";
-		break;
-	case CLASS_WARRIOR:
-		return "Warrior";
-		break;
-	case CLASS_MAGE:
-		return "Mage";
-		break;
-	case CLASS_WARLOCK:
-		return "Warlock";
-		break;
-	case CLASS_SHAMAN:
-		return "Shaman";
-		break;
-	case CLASS_DRUID:
-		return "Druid";
-		break;
-	case CLASS_HUNTER:
-		return "Hunter";
-		break;
-	case CLASS_ROGUE:
-		return "Rogue";
-		break;
-	case CLASS_DEATH_KNIGHT:
-		return "DeathKnight";
-		break;
-	default:
-		break;
-	}
-	return ""; // Fix warning, this should never happen
-}
+	std::string    playerClass;
+	std::string    playerSpec;
+	uint32         talentId;
+};
 
-static bool OverwriteTemplate(Player* player, std::string& playerSpecStr)
+struct GlyphTemplate
 {
-	// Delete old talent and glyph templates before extracting new ones
-	CharacterDatabase.PExecute("DELETE FROM template_npc_talents WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
-	CharacterDatabase.PExecute("DELETE FROM template_npc_glyphs WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
+	std::string    playerClass;
+	std::string    playerSpec;
+	uint8          slot;
+	uint32         glyph;
+};
 
-	// Delete old gear templates before extracting new ones
-	if (player->getRace() == RACE_HUMAN)
-	{
-		CharacterDatabase.PExecute("DELETE FROM template_npc_human WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
-		player->GetSession()->SendAreaTriggerMessage("Template successfuly created!");
-		return false;
-	}
-	else if (player->GetTeam() == ALLIANCE && player->getRace() != RACE_HUMAN)
-	{
-		CharacterDatabase.PExecute("DELETE FROM template_npc_alliance WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
-		player->GetSession()->SendAreaTriggerMessage("Template successfuly created!");
-		return false;
-	}
-	else if (player->GetTeam() == HORDE)
-	{
-		CharacterDatabase.PExecute("DELETE FROM template_npc_horde WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
-		player->GetSession()->SendAreaTriggerMessage("Template successfuly created!");
-		return false;
-	}
-	return true;
-}
-
-static void ExtractGearTemplateToDB(Player* player, std::string& playerSpecStr)
+struct HumanGearTemplate
 {
-	for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
-	{
-		Item* equippedItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+	std::string    playerClass;
+	std::string    playerSpec;
+	uint8          pos;
+	uint32         itemEntry;
+	uint32         enchant;
+	uint32         socket1;
+	uint32         socket2;
+	uint32         socket3;
+	uint32         bonusEnchant;
+	uint32         prismaticEnchant;
+};
 
-		if (equippedItem)
-		{
-			if (player->getRace() == RACE_HUMAN)
-			{
-				CharacterDatabase.PExecute("INSERT INTO template_npc_human (`playerClass`, `playerSpec`, `pos`, `itemEntry`, `enchant`, `socket1`, `socket2`, `socket3`, `bonusEnchant`, `prismaticEnchant`) VALUES ('%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u');"
-					, GetClassString(player).c_str(), playerSpecStr.c_str(), equippedItem->GetSlot(), equippedItem->GetEntry(), equippedItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT), 
-					equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_2), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3),
-					equippedItem->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(PRISMATIC_ENCHANTMENT_SLOT));
-			}
-			else if (player->GetTeam() == ALLIANCE && player->getRace() != RACE_HUMAN)
-			{
-				CharacterDatabase.PExecute("INSERT INTO template_npc_alliance (`playerClass`, `playerSpec`, `pos`, `itemEntry`, `enchant`, `socket1`, `socket2`, `socket3`, `bonusEnchant`, `prismaticEnchant`) VALUES ('%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u');"
-					, GetClassString(player).c_str(), playerSpecStr.c_str(), equippedItem->GetSlot(), equippedItem->GetEntry(), equippedItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT), 
-					equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_2), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3),
-					equippedItem->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(PRISMATIC_ENCHANTMENT_SLOT));
-			}
-			else if (player->GetTeam() == HORDE)
-			{
-				CharacterDatabase.PExecute("INSERT INTO template_npc_horde (`playerClass`, `playerSpec`, `pos`, `itemEntry`, `enchant`, `socket1`, `socket2`, `socket3`, `bonusEnchant`, `prismaticEnchant`) VALUES ('%s', '%s', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u');"
-					, GetClassString(player).c_str(), playerSpecStr.c_str(), equippedItem->GetSlot(), equippedItem->GetEntry(), equippedItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT), 
-					equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_2), equippedItem->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3),
-					equippedItem->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT), equippedItem->GetEnchantmentId(PRISMATIC_ENCHANTMENT_SLOT));
-			}
-		}
-	}
-}
-
-static void ExtractTalentTemplateToDB(Player* player, std::string& playerSpecStr)
+struct AllianceGearTemplate
 {
-	QueryResult result = CharacterDatabase.PQuery("SELECT spell FROM character_talent WHERE guid = '%u' "
-		"AND spec = '%u';", player->GetGUID(), player->GetActiveSpec());
+	std::string    playerClass;
+	std::string    playerSpec;
+	uint8          pos;
+	uint32         itemEntry;
+	uint32         enchant;
+	uint32         socket1;
+	uint32         socket2;
+	uint32         socket3;
+	uint32         bonusEnchant;
+	uint32         prismaticEnchant;
+};
 
-	if (!result)
-	{
-		return;
-	}
-	else if (player->GetFreeTalentPoints() > 0)
-	{
-		player->GetSession()->SendAreaTriggerMessage("You have unspend talent points. Please spend all your talent points and re-extract the template.");
-		return;
-	}
-	else
-	{
-		do
-		{
-			Field* fields = result->Fetch(); 
-			uint32 spell = fields[0].GetUInt32();
-
-			CharacterDatabase.PExecute("INSERT INTO template_npc_talents (playerClass, playerSpec, talentId) "
-				"VALUES ('%s', '%s', '%u');", GetClassString(player).c_str(), playerSpecStr.c_str(), spell);
-		}
-		while (result->NextRow());
-	}
-}
-
-static void ExtractGlyphsTemplateToDB(Player* player, std::string& playerSpecStr)
+struct HordeGearTemplate
 {
-	for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
-	{
-		QueryResult result = CharacterDatabase.PQuery("SELECT glyph1, glyph2, glyph3, glyph4, glyph5, glyph6 "
-			"FROM character_glyphs WHERE guid = '%u' AND spec = '%u';", player->GetGUID(), player->GetActiveSpec());
+	std::string    playerClass;
+	std::string    playerSpec;
+	uint8          pos;
+	uint32         itemEntry;
+	uint32         enchant;
+	uint32         socket1;
+	uint32         socket2;
+	uint32         socket3;
+	uint32         bonusEnchant;
+	uint32         prismaticEnchant;
+};
 
-		if (!result)
-		{ 
-			player->GetSession()->SendAreaTriggerMessage("Get glyphs and re-extract the template!");
-			continue;
-		}
+typedef std::vector<HumanGearTemplate*> HumanGearContainer;
+typedef std::vector<AllianceGearTemplate*> AllianceGearContainer;
+typedef std::vector<HordeGearTemplate*> HordeGearContainer;
 
-		Field* fields = result->Fetch();
-		uint32 glyph1 = fields[0].GetUInt32();
-		uint32 glyph2 = fields[1].GetUInt32();
-		uint32 glyph3 = fields[2].GetUInt32();
-		uint32 glyph4 = fields[3].GetUInt32();
-		uint32 glyph5 = fields[4].GetUInt32();
-		uint32 glyph6 = fields[5].GetUInt32();
+typedef std::vector<TalentTemplate*> TalentContainer;
+typedef std::vector<GlyphTemplate*> GlyphContainer;
 
-		uint32 storedGlyph;
-
-		switch (slot)
-		{
-		case 0:
-			storedGlyph = glyph1;
-			break;
-		case 1:
-			storedGlyph = glyph2;
-			break;
-		case 2:
-			storedGlyph = glyph3;
-			break;
-		case 3:
-			storedGlyph = glyph4;
-			break;
-		case 4:
-			storedGlyph = glyph5;
-			break;
-		case 5:
-			storedGlyph = glyph6;
-			break;
-		default:
-			break;
-		}
-
-		CharacterDatabase.PExecute("INSERT INTO template_npc_glyphs (playerClass, playerSpec, slot, glyph) "
-			"VALUES ('%s', '%s', '%u', '%u');", GetClassString(player).c_str(), playerSpecStr.c_str(), slot, storedGlyph);
-	}
-}
-
-static bool CanEquipTemplate(Player* player, std::string& playerSpecStr)
+class sTemplateNPC
 {
-	if (player->getRace() == RACE_HUMAN)
-	{
-		QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec FROM template_npc_human "
-			"WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
+public:
+	void LoadTalentsContainer();
+	void LoadGlyphsContainer();
 
-		if (!result)
-			return false;
-	}
-	else if (player->GetTeam() == ALLIANCE && player->getRace() != RACE_HUMAN)
-	{
-		QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec FROM template_npc_alliance "
-			"WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
+	void LoadHumanGearContainer();
+	void LoadAllianceGearContainer();
+	void LoadHordeGearContainer();
 
-		if (!result)
-			return false;
-	}
-	else if (player->GetTeam() == HORDE)
-	{
-		QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec FROM template_npc_horde "
-			"WHERE playerClass = '%s' AND playerSpec = '%s';", GetClassString(player).c_str(), playerSpecStr.c_str());
+	void ApplyGlyph(Player* player, uint8 slot, uint32 glyphID);
+	void ApplyBonus(Player* player, Item* item, EnchantmentSlot slot, uint32 bonusEntry);
 
-		if (!result)
-			return false;
-	}
-	return true;
-}
+	bool OverwriteTemplate(Player* /*player*/, std::string& /*playerSpecStr*/);
+	void ExtractGearTemplateToDB(Player* /*player*/, std::string& /*playerSpecStr*/);
+	void ExtractTalentTemplateToDB(Player* /*player*/, std::string& /*playerSpecStr*/);
+	void ExtractGlyphsTemplateToDB(Player* /*player*/, std::string& /*playerSpecStr*/);
+	bool CanEquipTemplate(Player* /*player*/, std::string& /*playerSpecStr*/);
 
+	std::string GetClassString(Player* /*player*/);
+	std::string sTalentsSpec;
+
+	void LearnTemplateTalents(Player* /*player*/);
+	void LearnTemplateGlyphs(Player* /*player*/);
+	void EquipTemplateGear(Player* /*player*/);
+
+	void LearnPlateMailSpells(Player* /*player*/);
+
+	GlyphContainer m_GlyphContainer;
+	TalentContainer m_TalentContainer;
+
+	HumanGearContainer m_HumanGearContainer;
+	AllianceGearContainer m_AllianceGearContainer;
+	HordeGearContainer m_HordeGearContainer;
+};
+#define sTemplateNpcMgr ACE_Singleton<sTemplateNPC, ACE_Null_Mutex>::instance()
 #endif
