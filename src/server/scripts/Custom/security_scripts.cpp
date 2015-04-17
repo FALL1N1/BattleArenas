@@ -5,6 +5,7 @@
 //     / /_/ / /_/ / /_/ /_/ /  __/ ___ |/ /  /  __/ / / / /_/ (__  )      //
 //    /_____/\__,_/\__/\__/_/\___/_/  |_/_/   \___/_/ /_/\__,_/____/       //
 //         Developed by Natureknight for BattleArenas.no-ip.org            //
+//                                                                         //
 /////////////////////////////////////////////////////////////////////////////
 
 #include "ScriptPCH.h"
@@ -25,6 +26,14 @@ public:
 
 	void OnUpdateZone(Player* pPlayer, uint32 newZone, uint32 newArea)
 	{
+		// This will be a workaround for naked characters:
+		// It will add aura for Gnomatic X-Ray Glasses
+		uint32 spellId = 54844;
+		// and then will instantly remove the aura to
+		// reload all the characters equipped gear
+		pPlayer->AddAura(spellId, pPlayer);
+		pPlayer->RemoveAura(spellId);
+
 		// Forbidden areas:
 		switch (pPlayer->GetAreaId())
 		{
@@ -57,6 +66,14 @@ public:
 
 	void OnLogin(Player* player)
 	{
+		// This will be a workaround for naked characters:
+		// It will add aura for Gnomatic X-Ray Glasses
+		uint32 spellId = 54844;
+		// and then will instantly remove the aura to
+		// reload all the characters equipped gear
+		player->AddAura(spellId, player);
+		player->RemoveAura(spellId);
+
 		//ExecuteLearnScriptInChat(player);
 
 		// Cache deletion reminder to new players
@@ -146,8 +163,7 @@ public:
 			msg = "";
 
 			ChatHandler(player->GetSession()).PSendSysMessage("|cffF00000You need at least 30 minutes playtime to use global channels or whispers. Note that you can still whisper to a GMs.");
-			player->GetSession()->SendAreaTriggerMessage("|cffF00000You need at least 30 minutes playtime to use global channels or whispers.");
-			player->GetSession()->SendAreaTriggerMessage("|cffF00000Your current played time: %u minutes.", currentTime);
+			ChatHandler(player->GetSession()).PSendSysMessage("|cffF00000Your current played time: %u minutes.", currentTime);
 			return;
 		}
 	}
