@@ -808,7 +808,7 @@ public:
                 float z = GetTargetUnit()->GetPositionZ();
 
                 // Death Grip's minimum range set to 8 yards
-                if (GetTargetUnit()->GetTypeId() == TYPEID_PLAYER)
+                if (GetTargetUnit()->GetTypeId() != TYPEID_PLAYER)
                     if (caster->GetDistance(x, y, z) < 8)
                         return SPELL_FAILED_TOO_CLOSE;
             }
