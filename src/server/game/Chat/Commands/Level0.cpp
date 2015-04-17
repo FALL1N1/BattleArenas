@@ -92,9 +92,9 @@ bool ChatHandler::HandleServerInfoCommand(const char* /*args*/)
 	std::string uptime = secsToTimeString(sWorld->GetUptime());
 	uint32 updateTime = sWorld->GetUpdateTime();
 
-	PSendSysMessage("BA Core: Win32-0443-06-Apr-2015 ("_BUILD_DIRECTIVE")");
+	PSendSysMessage("BA Core: WIN32::0467-17-APR-2015 ("_BUILD_DIRECTIVE")");
 	PSendSysMessage("Developed by Natureknight");
-	PSendSysMessage("Revision hash: e8c585a0bd3c");
+	PSendSysMessage("Revision hash: b9803b3be14259198a6042be4bac63531c7d73b2");
 
 	// Select also the fake players and display the info
 	if (sWorld->getBoolConfig(CONFIG_FAKE_WHO_LIST))
