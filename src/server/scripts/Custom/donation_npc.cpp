@@ -5,7 +5,8 @@
 //     / /_/ / /_/ / /_/ /_/ /  __/ ___ |/ /  /  __/ / / / /_/ (__  )      //
 //    /_____/\__,_/\__/\__/_/\___/_/  |_/_/   \___/_/ /_/\__,_/____/       //
 //         Developed by Natureknight for BattleArenas.no-ip.org            //
-//                                                                         //
+//             Copyright (C) 2015 Natureknight/JessiqueBA                  //
+//                      battlearenas.no-ip.org                             //
 /////////////////////////////////////////////////////////////////////////////
 
 #include "ScriptPCH.h"
@@ -13,6 +14,8 @@
 // IMPORTANT: Write your definitions here:
 
 std::string website = "fusioncms_new";       // FusionCMS database name
+
+// Those are already in the item_template (db) so dont need to touch them:
 const uint32 DONOR_TOKEN = 49927;            // Define the donor token Item ID
 const uint32 ONE_CHARACTER_VIP = 4992700;    // Define one-character vip Item ID
 
@@ -83,6 +86,7 @@ public:
 		std::stringstream purchaseHonor;
 		std::stringstream purchaseArena;
 		std::stringstream points;
+		std::stringstream purchaseTitle;
 
 		// TODO: Prevent exploiting the FusionCMS donate points
 		if (pPlayer->GetSession()->GetSecurity() < 5 && SelectDPoints(pPlayer) > 50)
@@ -108,7 +112,7 @@ public:
 		// Allow players to get honor points by using their voting points
 		if (SelectVPoints(pPlayer) < honorPtsPrice)
 		{
-			purchaseHonor << "Purchase 2k Honor Points (|cff980000Locked|r / Min %u VP needed)" << honorPtsPrice;
+			purchaseHonor << "Purchase 2k Honor Points (|cff980000Locked|r / Min " << honorPtsPrice << " VP needed)";
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, purchaseHonor.str().c_str(), GOSSIP_SENDER_MAIN, 999);
 		}
 		else if (SelectVPoints(pPlayer) >= honorPtsPrice)
@@ -120,7 +124,7 @@ public:
 		// Allow player to get arena points by using their voting points
 		if (SelectVPoints(pPlayer) < arenaPtsPrice)
 		{
-			purchaseArena << "Purchase 1k Arena Points (|cff980000Locked|r / Min %u VP needed)" << arenaPtsPrice;
+			purchaseArena << "Purchase 1k Arena Points (|cff980000Locked|r / Min " << arenaPtsPrice << " VP needed)";
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, purchaseArena.str().c_str(), GOSSIP_SENDER_MAIN, 999);
 		}
 		else if (SelectVPoints(pPlayer) >= arenaPtsPrice)
@@ -129,11 +133,18 @@ public:
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, purchaseArena.str().c_str(), GOSSIP_SENDER_MAIN, 6);
 		}
 
-		// Allow players to get titles by using their donation points
+
+		// Allow player to get arena points by using their voting points
 		if (SelectDPoints(pPlayer) < titlePrice)
-			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Purchase Character Title (|cff980000Locked|r / Min 1 DP needed)", GOSSIP_SENDER_MAIN, 7);
-		else if (SelectDPoints(pPlayer) >= 1)
-			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Purchase Character Title (|cff009900Unlocked|r / Click to use)", GOSSIP_SENDER_MAIN, 7);
+		{
+			purchaseTitle << "Purchase Character Title (|cff980000Locked|r / Min " << titlePrice << " DP needed)";
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, purchaseTitle.str().c_str(), GOSSIP_SENDER_MAIN, 7);
+		}
+		else if (SelectDPoints(pPlayer) >= titlePrice)
+		{
+			purchaseTitle << "Purchase Character Title (|cff009900Unlocked|r / Click to use)";
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, purchaseTitle.str().c_str(), GOSSIP_SENDER_MAIN, 7);
+		}
 
 		// Show Donate and Voting Points when GossipHello
 		points << "My Donation Points amount: " << SelectDPoints(pPlayer);
@@ -200,6 +211,7 @@ public:
 
 		case 5: // Honor Points - 2000
 			LoginDatabase.PExecute("UPDATE %s.account_data SET vp = '%u' -%u WHERE id = '%u'", website.c_str(), vp, honorPtsPrice, pPlayer->GetSession()->GetAccountId());
+			pPlayer->GetSession()->SendAreaTriggerMessage("Successfully earned 2000 Honor Points. Thanks for the support!");
 			pPlayer->ModifyHonorPoints(2000);
 			pPlayer->SaveToDB();
 			pPlayer->CLOSE_GOSSIP_MENU();
@@ -207,6 +219,7 @@ public:
 
 		case 6: // Arena Points - 1000
 			LoginDatabase.PExecute("UPDATE %s.account_data SET vp = '%u' -%u WHERE id = '%u'", website.c_str(), vp, arenaPtsPrice, pPlayer->GetSession()->GetAccountId());
+			pPlayer->GetSession()->SendAreaTriggerMessage("Successfully earned 1000 Arena Points. Thanks for the support!");
 			pPlayer->ModifyArenaPoints(1000);
 			pPlayer->SaveToDB();
 			pPlayer->CLOSE_GOSSIP_MENU();
