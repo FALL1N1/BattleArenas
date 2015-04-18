@@ -5,7 +5,8 @@
 //     / /_/ / /_/ / /_/ /_/ /  __/ ___ |/ /  /  __/ / / / /_/ (__  )      //
 //    /_____/\__,_/\__/\__/_/\___/_/  |_/_/   \___/_/ /_/\__,_/____/       //
 //         Developed by Natureknight for BattleArenas.no-ip.org            //
-//                                                                         //
+//             Copyright (C) 2015 Natureknight/JessiqueBA                  //
+//                      battlearenas.no-ip.org                             //
 /////////////////////////////////////////////////////////////////////////////
 
 #include "ScriptPCH.h"
@@ -127,12 +128,12 @@ public:
 	//{
 	//	CheckMessage(player, msg, lang, NULL, group, NULL, NULL);
 	//}
-	
+
 	//void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Guild* guild) // Guild
 	//{
 	//	CheckMessage(player, msg, lang, NULL, NULL, guild, NULL);
 	//}
-	
+
 	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Player* receiver) // Whisper
 	{
 		// Whispers only to GM is available

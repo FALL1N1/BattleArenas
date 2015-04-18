@@ -5,7 +5,8 @@
 //     / /_/ / /_/ / /_/ /_/ /  __/ ___ |/ /  /  __/ / / / /_/ (__  )      //
 //    /_____/\__,_/\__/\__/_/\___/_/  |_/_/   \___/_/ /_/\__,_/____/       //
 //         Developed by Natureknight for BattleArenas.no-ip.org            //
-//                                                                         //
+//             Copyright (C) 2015 Natureknight/JessiqueBA                  //
+//                      battlearenas.no-ip.org                             //
 /////////////////////////////////////////////////////////////////////////////
 
 #include "ScriptPCH.h"
