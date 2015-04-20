@@ -178,7 +178,7 @@ void sTemplateNPC::LoadGlyphsContainer()
 {
 	for (GlyphContainer::const_iterator itr = m_GlyphContainer.begin(); itr != m_GlyphContainer.end(); ++itr)
 		delete *itr;
-			
+
 	m_GlyphContainer.clear();
 
 	QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec, slot, glyph FROM template_npc_glyphs;");
@@ -216,7 +216,7 @@ void sTemplateNPC::LoadHumanGearContainer()
 {
 	for (HumanGearContainer::const_iterator itr = m_HumanGearContainer.begin(); itr != m_HumanGearContainer.end(); ++itr)
 		delete *itr;
-			
+
 	m_HumanGearContainer.clear();
 
 	QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec, pos, itemEntry, enchant, socket1, socket2, socket3, bonusEnchant, prismaticEnchant FROM template_npc_human;");
@@ -260,7 +260,7 @@ void sTemplateNPC::LoadAllianceGearContainer()
 {
 	for (AllianceGearContainer::const_iterator itr = m_AllianceGearContainer.begin(); itr != m_AllianceGearContainer.end(); ++itr)
 		delete *itr;
-			
+
 	m_AllianceGearContainer.clear();
 
 	QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec, pos, itemEntry, enchant, socket1, socket2, socket3, bonusEnchant, prismaticEnchant FROM template_npc_alliance;");
@@ -304,7 +304,7 @@ void sTemplateNPC::LoadHordeGearContainer()
 {
 	for (HordeGearContainer::const_iterator itr = m_HordeGearContainer.begin(); itr != m_HordeGearContainer.end(); ++itr)
 		delete *itr;
-			
+
 	m_HordeGearContainer.clear();
 
 	QueryResult result = CharacterDatabase.PQuery("SELECT playerClass, playerSpec, pos, itemEntry, enchant, socket1, socket2, socket3, bonusEnchant, prismaticEnchant FROM template_npc_horde;");
@@ -348,40 +348,20 @@ std::string sTemplateNPC::GetClassString(Player* player)
 {
 	switch (player->getClass())
 	{
-	case CLASS_PRIEST:
-		return "Priest";
-		break;
-	case CLASS_PALADIN:
-		return "Paladin";
-		break;
-	case CLASS_WARRIOR:
-		return "Warrior";
-		break;
-	case CLASS_MAGE:
-		return "Mage";
-		break;
-	case CLASS_WARLOCK:
-		return "Warlock";
-		break;
-	case CLASS_SHAMAN:
-		return "Shaman";
-		break;
-	case CLASS_DRUID:
-		return "Druid";
-		break;
-	case CLASS_HUNTER:
-		return "Hunter";
-		break;
-	case CLASS_ROGUE:
-		return "Rogue";
-		break;
-	case CLASS_DEATH_KNIGHT:
-		return "DeathKnight";
-		break;
+	case CLASS_PRIEST:       return "Priest";      break;
+	case CLASS_PALADIN:      return "Paladin";     break;
+	case CLASS_WARRIOR:      return "Warrior";     break;
+	case CLASS_MAGE:         return "Mage";        break;
+	case CLASS_WARLOCK:      return "Warlock";     break;
+	case CLASS_SHAMAN:       return "Shaman";      break;
+	case CLASS_DRUID:        return "Druid";       break;
+	case CLASS_HUNTER:       return "Hunter";      break;
+	case CLASS_ROGUE:        return "Rogue";       break;
+	case CLASS_DEATH_KNIGHT: return "DeathKnight"; break;
 	default:
 		break;
 	}
-	return ""; // Fix warning, this should never happen
+	return "Unknown"; // Fix warning, this should never happen
 }
 
 bool sTemplateNPC::OverwriteTemplate(Player* player, std::string& playerSpecStr)

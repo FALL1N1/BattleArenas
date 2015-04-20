@@ -39,17 +39,18 @@ enum WeaponProficiencies
 	TWO_H_AXES      = 197,
 	TWO_H_MACES     = 199,
 	TWO_H_SWORDS    = 202,
-	WANDS           = 5009
+	WANDS           = 5009,
+	THROW_WAR       = 2567
 };
 
 static void LearnWeaponSkills(Player* player)
 {
 	WeaponProficiencies wepSkills[] = {
 		BLOCK, BOWS, CROSSBOWS, DAGGERS, FIST_WEAPONS, GUNS, ONE_H_AXES, ONE_H_MACES,
-		ONE_H_SWORDS, POLEARMS, SHOOT, STAVES, TWO_H_AXES, TWO_H_MACES, TWO_H_SWORDS, WANDS
+		ONE_H_SWORDS, POLEARMS, SHOOT, STAVES, TWO_H_AXES, TWO_H_MACES, TWO_H_SWORDS, WANDS, THROW_WAR
 	};
 
-	uint32 size = 16;
+	uint32 size = 17;
 
 	for (uint32 i = 0; i < size; ++i)
 		if (player->HasSpell(wepSkills[i]))
@@ -58,6 +59,7 @@ static void LearnWeaponSkills(Player* player)
 	switch (player->getClass())
 	{
 	case CLASS_WARRIOR:
+		player->learnSpell(THROW_WAR, false);
 		player->learnSpell(TWO_H_SWORDS, false);
 		player->learnSpell(TWO_H_MACES, false);
 		player->learnSpell(TWO_H_AXES, false);
@@ -127,6 +129,7 @@ static void LearnWeaponSkills(Player* player)
 		player->learnSpell(BLOCK, false);
 		break;
 	case CLASS_HUNTER:
+		player->learnSpell(THROW_WAR, false);
 		player->learnSpell(TWO_H_SWORDS, false);
 		player->learnSpell(TWO_H_AXES, false);
 		player->learnSpell(STAVES, false);
