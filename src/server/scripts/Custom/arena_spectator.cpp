@@ -346,9 +346,10 @@ enum NpcSpectatorAtions {
 	// will be used for scrolling
 	NPC_SPECTATOR_ACTION_LIST_GAMES         = 1000,
 	NPC_SPECTATOR_ACTION_LIST_TOP_GAMES     = 2000,
+	NPC_SPECTATOR_ACTION_SPECIFIC           = 3000,
 
 	//NPC_SPECTATOR_ACTION_SELECTED_PLAYER + player.Guid()
-	NPC_SPECTATOR_ACTION_SELECTED_PLAYER    = 3000
+	NPC_SPECTATOR_ACTION_SELECTED_PLAYER    = 4000
 };
 
 const uint16 TopGamesRating = 5000;
@@ -362,7 +363,7 @@ public:
 	bool OnGossipHello(Player* pPlayer, Creature* pCreature)
 	{
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Spectate all 2vs2, 3vs3 and Solo arena games currently running.", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_LIST_GAMES);
-		//pPlayer->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Spectate arena game of specific player.", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_SELECTED_PLAYER, "", 0, true);
+		pPlayer->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Spectate arena game of a specific player.", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_SPECIFIC, "", 0, true);
 		pPlayer->SEND_GOSSIP_MENU(60000, pCreature->GetGUID());
 		return true;
 	}
@@ -377,17 +378,20 @@ public:
 		}
 		else if (action >= NPC_SPECTATOR_ACTION_LIST_TOP_GAMES && action < NPC_SPECTATOR_ACTION_LIST_TOP_GAMES)
 		{
-			ShowPage(player, action - NPC_SPECTATOR_ACTION_LIST_TOP_GAMES, /*true*/false);
+			ShowPage(player, action - NPC_SPECTATOR_ACTION_LIST_TOP_GAMES, false);
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
 		}
 		else
 		{
-			uint64 guid = action - NPC_SPECTATOR_ACTION_SELECTED_PLAYER;
-			if (Player* target = ObjectAccessor::FindPlayer(guid))
-			{
-				ChatHandler handler(player);
-				arena_spectator_commands::HandleSpectateCommand(&handler, target->GetName());
-			}
+			uint64 guid = action - NPC_SPECTATOR_ACTION_SELECTED_PLAYER; 
+			if (Player* target = ObjectAccessor::FindPlayer(guid)) 
+			{ 
+				ChatHandler handler(player->GetSession()); 
+				std::string str = target->GetName(); 
+				char* pTarget; 
+				std::strcpy (pTarget, str.c_str()); 
+				arena_spectator_commands::HandleSpectateCommand(&handler, pTarget); 
+			} 
 		}
 		return true;
 	}
@@ -497,6 +501,48 @@ public:
 
 		if (haveNextPage)
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "Next...", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_LIST_GAMES + page + 1);
+	}
+
+	bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, const char* code)
+	{
+		if (!player)
+			return true;
+
+		player->PlayerTalkClass->ClearMenus();
+		player->CLOSE_GOSSIP_MENU();
+
+		if (sender == GOSSIP_SENDER_MAIN)
+		{
+			switch (action)
+			{
+			case NPC_SPECTATOR_ACTION_SPECIFIC: // choosing a player
+
+				const char* plrName = code;
+				char playerName[50];
+				strcpy(playerName, plrName);
+
+				for (int i = 0; i < 13; i++)
+				{
+					if (playerName[i] == NULL)
+						break;
+					if (i == 0 && playerName[i] > 96)
+						playerName[0] -= 32;
+					else if (playerName[i] < 97)
+						playerName[i] += 32;
+				}
+
+				if (Player* target = sObjectAccessor->FindPlayerByName(playerName))
+				{
+					ChatHandler handler(player->GetSession());
+					char const* pTarget = target->GetName();
+					arena_spectator_commands::HandleSpectateCommand(&handler, pTarget);
+				}
+				else
+					ChatHandler(player->GetSession()).PSendSysMessage("Player not found");
+				return true;
+			}
+		}
+		return false;
 	}
 };
 
