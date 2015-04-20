@@ -80,7 +80,7 @@ public:
 			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Teleport to VIP mall", GOSSIP_SENDER_MAIN, 13, "Are you sure you want to go to VIP Mall?", 0, false);
 			pPlayer->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Teleport to VIP Island", GOSSIP_SENDER_MAIN, 14, "Are you sure you want to go to VIP Island?", 0, false);
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Previous Page", GOSSIP_SENDER_MAIN, 15);
-			pPlayer->SEND_GOSSIP_MENU(60020, pCreature->GetGUID());
+			pPlayer->SEND_GOSSIP_MENU(/*60020*/DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
 			break;
 
 		case 1: // Darnassus Mall

@@ -150,7 +150,7 @@ public:
 		points << "My Donation Points amount: " << SelectDPoints(pPlayer);
 		points << "\n" << "My Voting Points amount: " << SelectVPoints(pPlayer);
 
-		pPlayer->ADD_GOSSIP_ITEM(4, points.str().c_str(), GOSSIP_SENDER_MAIN, 100); // No action here, just to show points
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, points.str().c_str(), GOSSIP_SENDER_MAIN, 100); // No action here, just to show points
 		pPlayer->SEND_GOSSIP_MENU(60031, pCreature->GetGUID());
 		return true;
 	}

@@ -19,10 +19,10 @@
 #include "Language.h"
 #include "npc_arena1v1.h"
 
-class npc_1v1arena : public CreatureScript
+class npc_10v10skirmish : public CreatureScript
 {
 public:
-	npc_1v1arena() : CreatureScript("npc_1v1arena") { }
+	npc_10v10skirmish() : CreatureScript("npc_10v10skirmish") { }
 
 	bool JoinQueueArena(Player* player, Creature* me, bool isRated)
 	{
@@ -96,33 +96,17 @@ public:
 		if(!player || !me)
 			return true;
 
-		Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(BATTLEGROUND_AA); // All Arenas
-		BattlegroundTypeId bgTypeId = bg->GetTypeID();
-		BattlegroundQueueTypeId bgQueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, bg->GetArenaType());
-
 		if(sWorld->getBoolConfig(CONFIG_ARENA_1V1_ENABLE) == false)
 		{
 			ChatHandler(player->GetSession()).SendSysMessage("1v1 disabled!");
 			return true;
 		}
 
-		//if (player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_10v10))
-		if (player->GetBattlegroundQueueIndex(bgQueTypeId)) // Any queue
+		if (player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_10v10))
 			player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Leave 10v10 Skirmish Queue", GOSSIP_SENDER_MAIN, 3, "Are you sure?", 0, false);
 		else
 			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Join 10v10 Skirmish Arena", GOSSIP_SENDER_MAIN, 20);
 
-		//if (player->GetArenaTeamId(ArenaTeam::GetSlotByType(ARENA_TEAM_5v5)) == NULL)
-		//    player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Create new 1v1 Arena team", GOSSIP_SENDER_MAIN, 1, "Create 1v1 arenateam?", sWorld->getIntConfig(CONFIG_ARENA_1V1_COSTS), false);
-		//else
-		//{
-		//	if (player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5) == false)
-		//	{
-		//		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Sign up 1v1 Arena (Rated)", GOSSIP_SENDER_MAIN, 2);
-		//		player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Disband Arena Team", GOSSIP_SENDER_MAIN, 5, "Are you sure?", 0, false);
-		//	}
-		//	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Show statistics", GOSSIP_SENDER_MAIN, 4);
-		//}
 		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Script Information", GOSSIP_SENDER_MAIN, 8);
 		player->SEND_GOSSIP_MENU(60014, me->GetGUID());
 		return true;
@@ -136,6 +120,20 @@ public:
 			return true;
 
 		player->PlayerTalkClass->ClearMenus();
+
+		// Players in queue are unable to join 10v10 skirmish
+		Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(BATTLEGROUND_AA); // All Arenas
+		BattlegroundTypeId bgTypeId = bg->GetTypeID();
+		BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, bg->GetArenaType());
+
+		// Its impossible to use uiAction 3 while is in another queue than 10v10
+		// so no problem to handle it this way:
+		if (player->GetBattlegroundQueueIndex(bgQueueTypeId) && uiAction != 3)
+		{
+			player->GetSession()->SendAreaTriggerMessage("You're already in another queue. Please remove it first.");
+			player->CLOSE_GOSSIP_MENU();
+			return false;
+		}
 
 		switch (uiAction)
 		{
@@ -151,8 +149,7 @@ public:
 
 		case 20: // Join Queue Arena (unrated)
 			{
-				// Remove the talents check for 10v10 only
-				if(/*Arena1v1CheckTalents(player) && */JoinQueueArena(player, me, false) == false)
+				if(JoinQueueArena(player, me, false) == false)
 					ChatHandler(player->GetSession()).SendSysMessage("Something went wrong while join queue.");
 
 				player->CLOSE_GOSSIP_MENU();
@@ -192,7 +189,7 @@ public:
 };
 
 
-void AddSC_npc_1v1arena()
+void AddSC_npc_10v10skirmish()
 {
-	new npc_1v1arena();
+	new npc_10v10skirmish();
 }

@@ -1245,7 +1245,7 @@ void AddBattlegroundScripts()
     void AddSC_npc_enchantment();
     void AddSC_Security_Scripts();
     void AddSC_Beastmaster_NPC();
-    void AddSC_npc_1v1arena();
+    void AddSC_npc_10v10skirmish();
     void AddSC_Arena_Scripts();
     void AddSC_mall_guide_horde();
     void AddSC_mall_guide_alliance();
@@ -1281,7 +1281,7 @@ void AddCustomScripts()
     AddSC_npc_enchantment();
     AddSC_Security_Scripts();
     AddSC_Beastmaster_NPC();
-    AddSC_npc_1v1arena();
+    AddSC_npc_10v10skirmish();
     AddSC_Arena_Scripts();
     AddSC_mall_guide_horde();
     AddSC_mall_guide_alliance();
