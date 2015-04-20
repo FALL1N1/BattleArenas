@@ -38,6 +38,7 @@ EndScriptData */
 #include "Chat.h"
 #include "WaypointManager.h"
 #include "WardenCheckMgr.h"
+#include "../../scripts/Custom/TemplateNPC.h"
 
 class reload_commandscript : public CommandScript
 {
@@ -158,6 +159,7 @@ public:
             { "waypoint_data",                SEC_ADMINISTRATOR, true,  &HandleReloadWpCommand,                         "", NULL },
             { "vehicle_accessory",            SEC_ADMINISTRATOR, true,  &HandleReloadVehicleAccessoryCommand,           "", NULL },
             { "vehicle_template_accessory",   SEC_ADMINISTRATOR, true,  &HandleReloadVehicleTemplateAccessoryCommand,   "", NULL },
+			{ "template_npc",                 SEC_ADMINISTRATOR, true,  &HandleReloadTemplateNpcCommand,                "", NULL },
             { NULL,                           0,                 false, NULL,                                           "", NULL }
         };
         static ChatCommand commandTable[] =
@@ -1305,6 +1307,18 @@ public:
         handler->SendGlobalGMSysMessage("Vehicle template accessories reloaded.");
         return true;
     }
+
+	static bool HandleReloadTemplateNpcCommand(ChatHandler* handler, const char* /*args*/)
+	{
+		sLog->outString("Reloading templates for Template NPC table...");
+		sTemplateNpcMgr->LoadTalentsContainer();
+		sTemplateNpcMgr->LoadGlyphsContainer();
+		sTemplateNpcMgr->LoadHumanGearContainer();
+		sTemplateNpcMgr->LoadAllianceGearContainer();
+		sTemplateNpcMgr->LoadHordeGearContainer();
+		handler->SendGlobalGMSysMessage("Template NPC templates reloaded.");
+		return true;
+	}
 };
 
 void AddSC_reload_commandscript()
