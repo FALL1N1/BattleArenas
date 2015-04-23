@@ -457,7 +457,11 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recv_data)
                 _player->CleanupAfterTaxiFlight();
             }
 
-            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType());
+			// Remove all pets before entering arena
+	        if (Pet* pet = _player->GetPet())
+				_player->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT);
+
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), _player->GetTeam());
             _player->GetSession()->SendPacket(&data);
             // remove battleground queue status from BGmgr
             bgQueue.RemovePlayer(_player->GetGUID(), false);
