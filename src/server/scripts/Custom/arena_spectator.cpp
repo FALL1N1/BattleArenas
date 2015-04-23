@@ -66,23 +66,6 @@ public:
 			return false;
 		}
 
-		if (player->GetPet())
-		{
-			handler->PSendSysMessage("You must dismiss your pet before spectating.");
-			handler->SetSentErrorMessage(true);
-			player->CLOSE_GOSSIP_MENU();
-			return false;
-		}
-
-		// Remove mount before spectating by Natureknight
-		if (player->IsMounted())
-		{
-			handler->PSendSysMessage("You must dismount before spectating.");
-			handler->SetSentErrorMessage(true);
-			player->CLOSE_GOSSIP_MENU();
-			return false;
-		}
-
 		if (player->GetMap()->IsBattlegroundOrArena() && !player->isSpectator())
 		{
 			handler->PSendSysMessage("You are already on battleground or arena.");
@@ -106,6 +89,21 @@ public:
 			handler->SetSentErrorMessage(true);
 			player->CLOSE_GOSSIP_MENU();
 			return false;
+		}
+
+		// Remove mounts and..
+		if (player->IsMounted())
+		{
+			player->Dismount();
+			player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+			player->CLOSE_GOSSIP_MENU();
+		}
+
+		// ..and pets before spectating by Natureknight
+		if (player->GetPet())
+		{
+			player->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT);
+			player->CLOSE_GOSSIP_MENU();
 		}
 
 		// all's well, set bg id
@@ -135,6 +133,7 @@ public:
 
 		// search for two teams
 		Battleground *bGround = target->GetBattleground();
+
 		if (bGround->isRated())
 		{
 			uint32 slot = bGround->GetArenaType();
@@ -344,15 +343,15 @@ public:
 
 enum NpcSpectatorAtions {
 	// will be used for scrolling
-	NPC_SPECTATOR_ACTION_LIST_GAMES         = 1000,
-	NPC_SPECTATOR_ACTION_LIST_TOP_GAMES     = 2000,
-	NPC_SPECTATOR_ACTION_SPECIFIC           = 3000,
+	NPC_SPECTATOR_2v2_RATED_GAMES           = 1000,
+	NPC_SPECTATOR_3v3_RATED_GAMES           = 2000,
+	NPC_SPECTATOR_3v3_SOLO_GAMES            = 3000,
+	NPC_SPECTATOR_ACTION_SPECIFIC           = 4000,
 
 	//NPC_SPECTATOR_ACTION_SELECTED_PLAYER + player.Guid()
-	NPC_SPECTATOR_ACTION_SELECTED_PLAYER    = 4000
+	NPC_SPECTATOR_ACTION_SELECTED_PLAYER    = 5000
 };
 
-const uint16 TopGamesRating = 5000;
 const uint8  GamesOnPage    = 20;
 
 class npc_arena_spectator : public CreatureScript
@@ -362,8 +361,18 @@ public:
 
 	bool OnGossipHello(Player* pPlayer, Creature* pCreature)
 	{
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Spectate all 2vs2, 3vs3 and Solo arena games currently running.", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_LIST_GAMES);
-		pPlayer->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Spectate arena game of a specific player.", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_SPECIFIC, "", 0, true);
+		std::stringstream games2v2;
+		std::stringstream games3v3;
+		std::stringstream games3v3solo;
+
+		games2v2 << "Spectate all 2v2 Rated games (Games currenlty running: " << CountArenaGames(ARENA_TYPE_2v2) << ")";
+		games3v3 << "Spectate all 3v3 Rated games (Games currently running: " << CountArenaGames(ARENA_TYPE_3v3) << ")";
+		games3v3solo << "Spectate all Solo 3v3 games (Games currently running: " << CountArenaGames(ARENA_TYPE_3v3_SOLO) << ")";
+
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, games2v2.str().c_str(), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_2v2_RATED_GAMES);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, games3v3.str().c_str(), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_3v3_RATED_GAMES);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, games3v3solo.str().c_str(), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_3v3_SOLO_GAMES);
+		pPlayer->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Spectate game of specific player..", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_SPECIFIC, "", 0, true);
 		pPlayer->SEND_GOSSIP_MENU(60000, pCreature->GetGUID());
 		return true;
 	}
@@ -371,14 +380,19 @@ public:
 	bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
 	{
 		player->PlayerTalkClass->ClearMenus();
-		if (action >= NPC_SPECTATOR_ACTION_LIST_GAMES && action < NPC_SPECTATOR_ACTION_LIST_TOP_GAMES)
+		if (action >= NPC_SPECTATOR_2v2_RATED_GAMES && action < NPC_SPECTATOR_3v3_RATED_GAMES)
 		{
-			ShowPage(player, action - NPC_SPECTATOR_ACTION_LIST_GAMES, false);
+			ShowPage(player, action - NPC_SPECTATOR_2v2_RATED_GAMES, ARENA_TYPE_2v2);
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
 		}
-		else if (action >= NPC_SPECTATOR_ACTION_LIST_TOP_GAMES && action < NPC_SPECTATOR_ACTION_LIST_TOP_GAMES)
+		else if (action >= NPC_SPECTATOR_3v3_RATED_GAMES && action < NPC_SPECTATOR_3v3_SOLO_GAMES)
 		{
-			ShowPage(player, action - NPC_SPECTATOR_ACTION_LIST_TOP_GAMES, false);
+			ShowPage(player, action - NPC_SPECTATOR_3v3_RATED_GAMES, ARENA_TYPE_3v3);
+			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+		}
+		else if (action >= NPC_SPECTATOR_3v3_SOLO_GAMES && action < NPC_SPECTATOR_ACTION_SPECIFIC)
+		{
+			ShowPage(player, action - NPC_SPECTATOR_3v3_SOLO_GAMES, ARENA_TYPE_3v3_SOLO);
 			player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
 		}
 		else
@@ -387,10 +401,7 @@ public:
 			if (Player* target = ObjectAccessor::FindPlayer(guid)) 
 			{ 
 				ChatHandler handler(player->GetSession()); 
-				std::string str = target->GetName(); 
-				char* pTarget; 
-				std::strcpy (pTarget, str.c_str()); 
-				arena_spectator_commands::HandleSpectateCommand(&handler, pTarget); 
+				arena_spectator_commands::HandleSpectateCommand(&handler, target->GetName()); 
 			} 
 		}
 		return true;
@@ -402,12 +413,12 @@ public:
 		switch (id)
 		{
 		case CLASS_WARRIOR:         sClass = "Warrior ";        break;
-		case CLASS_PALADIN:         sClass = "Paladin ";           break;
-		case CLASS_HUNTER:          sClass = "Hunter ";           break;
+		case CLASS_PALADIN:         sClass = "Paladin ";        break;
+		case CLASS_HUNTER:          sClass = "Hunter ";         break;
 		case CLASS_ROGUE:           sClass = "Rogue ";          break;
 		case CLASS_PRIEST:          sClass = "Priest ";         break;
 		case CLASS_DEATH_KNIGHT:    sClass = "DK ";             break;
-		case CLASS_SHAMAN:          sClass = "Shaman ";          break;
+		case CLASS_SHAMAN:          sClass = "Shaman ";         break;
 		case CLASS_MAGE:            sClass = "Mage ";           break;
 		case CLASS_WARLOCK:         sClass = "Warlock ";        break;
 		case CLASS_DRUID:           sClass = "Druid ";          break;
@@ -415,10 +426,11 @@ public:
 		return sClass;
 	}
 
-	std::string GetGamesStringData(Battleground *arena, uint16 mmr)
+	std::string GetGamesStringData(Battleground *arena, uint16 mmr, uint8 arenaTypeStr)
 	{
 		std::string teamsMember[BG_TEAMS_COUNT];
 		uint32 firstTeamId = 0;
+
 		for (Battleground::BattlegroundPlayerMap::const_iterator itr = arena->GetPlayers().begin(); itr != arena->GetPlayers().end(); ++itr)
 			if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 			{
@@ -434,8 +446,8 @@ public:
 
 			std::string data = teamsMember[0] + " - ";
 			std::stringstream ss;
-			ss << mmr;
-			data += ss.str();
+			ss << "(MMR: " << mmr << ")";
+			data += ss.str().c_str();
 			data += " - " + teamsMember[1];
 			return data;
 	}
@@ -448,11 +460,36 @@ public:
 		return 0;
 	}
 
-	void ShowPage(Player *player, uint16 page, bool isTop)
+	uint32 CountArenaGames(uint8 arType)
 	{
-		uint16 highGames  = 0;
-		uint16 lowGames   = 0;
+		uint16 CountGames = 0;
+
+		for (uint8 i = BATTLEGROUND_NA; i <= BATTLEGROUND_RV; ++i)
+		{
+			BattlegroundSet bgs = sBattlegroundMgr->GetBattlegroundsByType((BattlegroundTypeId)i);
+			for (BattlegroundSet::iterator itr = bgs.begin(); itr != bgs.end(); ++itr)
+			{
+				Battleground* arena = itr->second;
+
+				if (arena->GetArenaType() == arType && arena->isRated())
+				{
+					if (!arena->GetPlayersSize())
+						continue;
+
+					++CountGames;
+					return CountGames;
+				}
+			}
+		}
+		return 0;
+	}
+
+
+	void ShowPage(Player *player, uint16 page, uint8 uArenaType)
+	{
+		uint16 countArenaGames = 0;
 		bool haveNextPage = false;
+
 		for (uint8 i = BATTLEGROUND_NA; i <= BATTLEGROUND_RV; ++i)
 		{
 			if (!sBattlegroundMgr->IsArenaType((BattlegroundTypeId)i))
@@ -469,38 +506,25 @@ public:
 				uint16 mmr = arena->GetArenaMatchmakerRatingByIndex(0) + arena->GetArenaMatchmakerRatingByIndex(1);
 				mmr /= 2;
 
-				if (isTop && mmr >= TopGamesRating)
+				if (arena->GetArenaType() == uArenaType && arena->isRated())
 				{
-					highGames++;
-					if (highGames > (page + 1) * GamesOnPage)
+					countArenaGames++;
+					if (countArenaGames > (page + 1) * GamesOnPage)
 					{
 						haveNextPage = true;
 						break;
 					}
 
-					if (highGames >= page * GamesOnPage)
-						player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, GetGamesStringData(arena, mmr), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_SELECTED_PLAYER + GetFirstPlayerGuid(arena));
+					if (countArenaGames >= page * GamesOnPage)
+						player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, GetGamesStringData(arena, mmr, uArenaType), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_SELECTED_PLAYER + GetFirstPlayerGuid(arena));
 				}
-				else if (!isTop && mmr < TopGamesRating)
-				{
-					lowGames++;
-					if (lowGames > (page + 1) * GamesOnPage)
-					{
-						haveNextPage = true;
-						break;
-					}
+				if (page > 0)
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "Prev...", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_SELECTED_PLAYER + GetFirstPlayerGuid(arena) + page - 1);
 
-					if (lowGames >= page * GamesOnPage)
-						player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, GetGamesStringData(arena, mmr), GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_SELECTED_PLAYER + GetFirstPlayerGuid(arena));
-				}
+				if (haveNextPage)
+					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "Next...", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_SELECTED_PLAYER + GetFirstPlayerGuid(arena) + page + 1);
 			}
 		}
-
-		if (page > 0)
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "Prev...", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_LIST_GAMES + page - 1);
-
-		if (haveNextPage)
-			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "Next...", GOSSIP_SENDER_MAIN, NPC_SPECTATOR_ACTION_LIST_GAMES + page + 1);
 	}
 
 	bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, const char* code)
