@@ -66,7 +66,6 @@ void sTemplateNPC::LearnTemplateTalents(Player* player)
 			player->learnSpell((*itr)->talentId, false);
 			player->AddTalent((*itr)->talentId, player->GetActiveSpec(), true);
 		}
-		//delete *itr;
 	}
 	player->SetFreeTalentPoints(0);
 	player->SendTalentsInfoData(false);
@@ -97,7 +96,6 @@ void sTemplateNPC::EquipTemplateGear(Player* player)
 				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), SOCK_ENCHANTMENT_SLOT_3, (*itr)->socket3);
 				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), BONUS_ENCHANTMENT_SLOT, (*itr)->bonusEnchant);
 				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), PRISMATIC_ENCHANTMENT_SLOT, (*itr)->prismaticEnchant);
-
 			}
 		}
 	}
@@ -114,7 +112,6 @@ void sTemplateNPC::EquipTemplateGear(Player* player)
 				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), SOCK_ENCHANTMENT_SLOT_3, (*itr)->socket3);
 				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), BONUS_ENCHANTMENT_SLOT, (*itr)->bonusEnchant);
 				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), PRISMATIC_ENCHANTMENT_SLOT, (*itr)->prismaticEnchant);
-
 			}
 		}
 	}
@@ -131,7 +128,6 @@ void sTemplateNPC::EquipTemplateGear(Player* player)
 				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), SOCK_ENCHANTMENT_SLOT_3, (*itr)->socket3);
 				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), BONUS_ENCHANTMENT_SLOT, (*itr)->bonusEnchant);
 				ApplyBonus(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, (*itr)->pos), PRISMATIC_ENCHANTMENT_SLOT, (*itr)->prismaticEnchant);
-
 			}
 		}
 	}

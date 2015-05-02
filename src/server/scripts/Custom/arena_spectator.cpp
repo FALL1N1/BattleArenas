@@ -134,56 +134,57 @@ public:
 		// search for two teams
 		Battleground *bGround = target->GetBattleground();
 
-		if (bGround->isRated())
-		{
-			uint32 slot = bGround->GetArenaType();
-			if (bGround->GetArenaType() > 4) // Just in case
-				slot = 2;
+		// We need to display both Skirmish and Rated games:
+		//if (bGround->isRated())
+		//{
+		uint32 slot = bGround->GetArenaType();
+		if (bGround->GetArenaType() > 4) // Just in case of ARENA_TYPE_3v3_SOLO
+			slot = 2;
 
-			uint32 firstTeamID = target->GetArenaTeamId(slot);
-			uint32 secondTeamID = 0;
-			Player *firstTeamMember  = target;
-			Player *secondTeamMember = NULL;
-			for (Battleground::BattlegroundPlayerMap::const_iterator itr = bGround->GetPlayers().begin(); itr != bGround->GetPlayers().end(); ++itr)
-				if (Player* tmpPlayer = ObjectAccessor::FindPlayer(itr->first))
+		uint32 firstTeamID = target->GetArenaTeamId(slot);
+		uint32 secondTeamID = 0;
+		Player *firstTeamMember  = target;
+		Player *secondTeamMember = NULL;
+		for (Battleground::BattlegroundPlayerMap::const_iterator itr = bGround->GetPlayers().begin(); itr != bGround->GetPlayers().end(); ++itr)
+			if (Player* tmpPlayer = ObjectAccessor::FindPlayer(itr->first))
+			{
+				if (tmpPlayer->isSpectator())
+					continue;
+
+				uint32 tmpID = tmpPlayer->GetArenaTeamId(slot);
+				if (tmpID != firstTeamID && tmpID > 0)
 				{
-					if (tmpPlayer->isSpectator())
-						continue;
-
-					uint32 tmpID = tmpPlayer->GetArenaTeamId(slot);
-					if (tmpID != firstTeamID && tmpID > 0)
-					{
-						secondTeamID = tmpID;
-						secondTeamMember = tmpPlayer;
-						break;
-					}
+					secondTeamID = tmpID;
+					secondTeamMember = tmpPlayer;
+					break;
 				}
+			}
 
-				if (firstTeamID > 0 && secondTeamID > 0 && secondTeamMember)
+			if (firstTeamID > 0 && secondTeamID > 0 && secondTeamMember)
+			{
+				ArenaTeam *firstTeam  = sArenaTeamMgr->GetArenaTeamById(firstTeamID);
+				ArenaTeam *secondTeam = sArenaTeamMgr->GetArenaTeamById(secondTeamID);
+				if (firstTeam && secondTeam)
 				{
-					ArenaTeam *firstTeam  = sArenaTeamMgr->GetArenaTeamById(firstTeamID);
-					ArenaTeam *secondTeam = sArenaTeamMgr->GetArenaTeamById(secondTeamID);
-					if (firstTeam && secondTeam)
-					{
-						handler->PSendSysMessage("You entered to rated arena.");
-						handler->PSendSysMessage("Teams Information:");
-						handler->PSendSysMessage("Team Name: %s - Team Name: %s", firstTeam->GetName().c_str(), secondTeam->GetName().c_str());
-						handler->PSendSysMessage("Rating: %u(MMR: %u) - Rating: %u(MMR: %u)", firstTeam->GetRating(), firstTeam->GetAverageMMR(firstTeamMember->GetGroup()),
-							secondTeam->GetRating(), secondTeam->GetAverageMMR(secondTeamMember->GetGroup()));
-					}
+					handler->PSendSysMessage("You entered to rated arena.");
+					handler->PSendSysMessage("Teams Information:");
+					handler->PSendSysMessage("Team Name: %s - Team Name: %s", firstTeam->GetName().c_str(), secondTeam->GetName().c_str());
+					handler->PSendSysMessage("Rating: %u(MMR: %u) - Rating: %u(MMR: %u)", firstTeam->GetRating(), firstTeam->GetAverageMMR(firstTeamMember->GetGroup()),
+						secondTeam->GetRating(), secondTeam->GetAverageMMR(secondTeamMember->GetGroup()));
 				}
-		}
+			}
+			//}
 
-		// to point to see at target with same orientation
-		float x, y, z;
-		target->GetContactPoint(player, x, y, z);
+			// to point to see at target with same orientation
+			float x, y, z;
+			target->GetContactPoint(player, x, y, z);
 
-		player->TeleportTo(target->GetMapId(), x, y, z, player->GetAngle(target), TELE_TO_GM_MODE);
-		player->SetPhaseMask(target->GetPhaseMask(), true);
-		player->SetSpectate(true);
-		target->GetBattleground()->AddSpectator(player->GetGUID());
+			player->TeleportTo(target->GetMapId(), x, y, z, player->GetAngle(target), TELE_TO_GM_MODE);
+			player->SetPhaseMask(target->GetPhaseMask(), true);
+			player->SetSpectate(true);
+			target->GetBattleground()->AddSpectator(player->GetGUID());
 
-		return true;
+			return true;
 	}
 
 	static bool HandleSpectateCancelCommand(ChatHandler* handler, const char* /*args*/)
@@ -471,7 +472,7 @@ public:
 			{
 				Battleground* arena = itr->second;
 
-				if (arena->GetArenaType() == arType && arena->isRated())
+				if (arena->GetArenaType() == arType/* && arena->isRated()*/)
 				{
 					if (!arena->GetPlayersSize())
 						continue;
@@ -506,7 +507,7 @@ public:
 				uint16 mmr = arena->GetArenaMatchmakerRatingByIndex(0) + arena->GetArenaMatchmakerRatingByIndex(1);
 				mmr /= 2;
 
-				if (arena->GetArenaType() == uArenaType && arena->isRated())
+				if (arena->GetArenaType() == uArenaType/* && arena->isRated()*/)
 				{
 					countArenaGames++;
 					if (countArenaGames > (page + 1) * GamesOnPage)
