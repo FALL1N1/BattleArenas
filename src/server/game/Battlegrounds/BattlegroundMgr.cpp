@@ -194,6 +194,12 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
         return;
     }
 
+	bool isArenaSpectator = false;
+	for (Battleground::BattlegroundPlayerMap::const_iterator itr = bg->GetPlayers().begin(); itr != bg->GetPlayers().end(); ++itr)
+		if (Player* tmpPlayer = ObjectAccessor::FindPlayer(itr->first))
+			if (tmpPlayer->isSpectator())
+				isArenaSpectator = true;
+
     data->Initialize(SMSG_BATTLEFIELD_STATUS, (4+8+1+1+4+1+4+4+4));
     *data << uint32(QueueSlot);                             // queue id (0...1) - player can be in 2 queues in time
     // The following segment is read as uint64 in client but can be appended as their original type.
@@ -227,7 +233,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battlegro
             *data << uint64(0);                                  // 3.3.5, unknown
             *data << uint32(Time1);                              // time to bg auto leave, 0 at bg start, 120000 after bg end, milliseconds
             *data << uint32(Time2);                              // time from bg start, milliseconds
-			*data << uint8(uiFrame);
+			*data << uint8(isArenaSpectator == true ? 0 : uiFrame);
             break;
         default:
             sLog->outError("Unknown BG status!");
