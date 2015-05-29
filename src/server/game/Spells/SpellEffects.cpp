@@ -3049,7 +3049,8 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
 		duration = 1800;                                    // 30 mins
 	// other rogue family enchantments always 1 hour (some have spell damage=0, but some have wrong data in EffBasePoints)
 	else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
-		duration = 3600;                                    // 1 hour
+		// Increase duration for rogue poisons for 25 days
+		duration = 2147484;
 	// shaman family enchantments
 	else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN)
 		duration = 1800;                                    // 30 mins
