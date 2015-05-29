@@ -27,6 +27,10 @@ public:
 
 	void OnUpdateZone(Player* pPlayer, uint32 newZone, uint32 newArea)
 	{
+		// Remove Dementia on updating zone
+		if (pPlayer->HasAura(41406))
+			pPlayer->RemoveAura(41406);
+
 		// This will be a workaround for naked characters:
 		// It will add aura for Gnomatic X-Ray Glasses
 		uint32 spellId = 54844;
@@ -67,6 +71,10 @@ public:
 
 	void OnLogin(Player* player)
 	{
+		// Remove Dementia on login
+		if (player->HasAura(41406))
+			player->RemoveAura(41406);
+
 		// This will be a workaround for naked characters:
 		// It will add aura for Gnomatic X-Ray Glasses
 		uint32 spellId = 54844;

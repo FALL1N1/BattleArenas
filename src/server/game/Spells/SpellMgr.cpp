@@ -3239,6 +3239,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->procCharges = 2;
                 spellInfo->StackAmount = 0;
                 break;
+			case 41406: // Positive Dementia
+			case 41409: // Negative Dementia (UNUSED)
+				spellInfo->DurationIndex = 21; // Infinite
+				spellInfo->procCharges = 5; // Stack up to 5 times
+                spellInfo->StackAmount = 5; // Stack up to 5 times
+				break;
             case 28200: // Ascendance (Talisman of Ascendance trinket)
                 spellInfo->procCharges = 6;
                 break;
