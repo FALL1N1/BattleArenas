@@ -17,7 +17,7 @@
 #include "Battleground.h"
 #include "ArenaTeam.h"
 #include "Language.h"
-#include "npc_arena1v1.h"
+#include "npc_arena10v10.h"
 
 class npc_10v10skirmish : public CreatureScript
 {

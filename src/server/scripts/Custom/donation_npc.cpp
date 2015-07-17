@@ -165,7 +165,7 @@ public:
 		uint32 dp = SelectDPoints(pPlayer);
 		uint32 vp = SelectVPoints(pPlayer);
 
-		switch(uiAction)
+		switch (uiAction)
 		{
 		case 1: // Vip account - locked
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Back to Main Menu", GOSSIP_SENDER_MAIN, 1000);

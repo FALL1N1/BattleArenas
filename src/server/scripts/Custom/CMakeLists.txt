@@ -29,8 +29,8 @@ set(scripts_STAT_SRCS
   Custom/weptransmog.cpp
   Custom/beastmaster_npc.cpp
   Custom/enchanter_npc.cpp
-  Custom/npc_arena1v1.cpp
-  Custom/npc_arena1v1.h
+  Custom/npc_arena10v10.cpp
+  Custom/npc_arena10v10.h
   Custom/exchangeNPC.cpp
   Custom/mall_guide_alliance.cpp
   Custom/mall_guide_horde.cpp
@@ -46,6 +46,7 @@ set(scripts_STAT_SRCS
   Custom/TemplateNPC.h
   Custom/npc_solo3v3.cpp
   Custom/npc_solo3v3.h
+  Custom/arena_antiDraw.cpp
 )
 
 message("  -> Prepared: Custom")

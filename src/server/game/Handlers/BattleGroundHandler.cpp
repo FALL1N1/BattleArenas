@@ -35,7 +35,7 @@
 #include "DisableMgr.h"
 #include "Group.h"
 #include "Cfbg/Cfbg.h"
-#include "npc_arena1v1.h"
+#include "npc_arena10v10.h"
 
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recv_data)
 {

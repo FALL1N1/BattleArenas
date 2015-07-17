@@ -807,7 +807,7 @@ public:
                 float y = GetTargetUnit()->GetPositionY();
                 float z = GetTargetUnit()->GetPositionZ();
 
-                // Death Grip's minimum range set to 8 yards
+                // Death Grip's minimum range set to 8 yards in PvE
                 if (GetTargetUnit()->GetTypeId() != TYPEID_PLAYER)
                     if (caster->GetDistance(x, y, z) < 8)
                         return SPELL_FAILED_TOO_CLOSE;
@@ -819,7 +819,6 @@ public:
         {
             OnCheckCast += SpellCheckCastFn(spell_dk_death_grip_initial_SpellScript::CheckCast);
         }
-
     };
 
     SpellScript* GetSpellScript() const
@@ -856,7 +855,6 @@ class spell_dk_death_grip : public SpellScriptLoader
             {
                 OnEffectHitTarget += SpellEffectFn(spell_dk_death_grip_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
-
         };
 
         SpellScript* GetSpellScript() const

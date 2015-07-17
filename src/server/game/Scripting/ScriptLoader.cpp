@@ -1256,6 +1256,7 @@ void AddBattlegroundScripts()
     void AddSC_CooldownsCrystal();
     void AddSC_TemplateNPC();
     void AddSC_npc_solo3v3();
+	void AddSC_Arena_AntiDraw();
 #endif
 
 void AddCustomScripts()
@@ -1292,5 +1293,6 @@ void AddCustomScripts()
     AddSC_CooldownsCrystal();
     AddSC_TemplateNPC();
     AddSC_npc_solo3v3();
+	AddSC_Arena_AntiDraw();
 #endif
 }

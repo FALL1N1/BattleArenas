@@ -321,65 +321,63 @@ void Battleground::Update(uint32 diff)
 
 	PostUpdateImpl(diff);
 
-	// DEBUG TIMERS:
+	// This part handles the arena anti-draw system
 	for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
 	{
 		if (Player* player = ObjectAccessor::FindPlayer(itr->first))
 		{
-			Aura* demAura = player->GetAura(41406);
-			float startTimer = 10 * MINUTE * IN_MILLISECONDS;
+			uint32 SPELL_DEMENTIA = 41406;
 
-			if (!player->isSpectator())
+			if (Aura* demAura = player->GetAura(SPELL_DEMENTIA))
 			{
-				if ((GetStartTime() >= 10 * MINUTE * IN_MILLISECONDS) &&
-					(GetStartTime() <= 10.1 * MINUTE * IN_MILLISECONDS))
+				if (!player->isSpectator() && player->isAlive())
 				{
-					if (!player->HasAura(41406))
+					// If the timer is passed then apply
+					if (GetStartTime() >= 10 * MINUTE * IN_MILLISECONDS)
 					{
-						player->AddAura(41406, player);
-						player->GetSession()->SendAreaTriggerMessage("Damage and healing is going to progressively increase every minute from now! "
-							"This is made in case of draw for this arena.");
+						if (!player->HasAura(SPELL_DEMENTIA))
+						{
+							player->AddAura(SPELL_DEMENTIA, player);
+							player->GetSession()->SendAreaTriggerMessage("Damage and healing is going to progressively increase every minute from now! "
+								"This is made in case of draw for this arena.");
+						}
 					}
-				}
 
-				if ((GetStartTime() >= 11 * MINUTE * IN_MILLISECONDS) &&
-					(GetStartTime() <= 11.1 * MINUTE * IN_MILLISECONDS))
-				{
-					if (demAura->GetStackAmount() == 1)
+					if (GetStartTime() >= 11 * MINUTE * IN_MILLISECONDS)
 					{
-						player->AddAura(41406, player);
-						player->GetSession()->SendAreaTriggerMessage("Damage and healing is slightly increased!");
+						if (demAura->GetStackAmount() == 1)
+						{
+							player->AddAura(SPELL_DEMENTIA, player);
+							player->GetSession()->SendAreaTriggerMessage("Damage and healing is slightly increased!");
+						}
 					}
-				}
 
-				if ((GetStartTime() >= 12 * MINUTE * IN_MILLISECONDS) &&
-					(GetStartTime() <= 12.1 * MINUTE * IN_MILLISECONDS))
-				{
-					if (demAura->GetStackAmount() == 2)
+					if (GetStartTime() >= 12 * MINUTE * IN_MILLISECONDS)
 					{
-						player->AddAura(41406, player);
-						player->GetSession()->SendAreaTriggerMessage("Damage and healing is slightly increased!");
+						if (demAura->GetStackAmount() == 2)
+						{
+							player->AddAura(SPELL_DEMENTIA, player);
+							player->GetSession()->SendAreaTriggerMessage("Damage and healing is slightly increased!");
+						}
 					}
-				}
 
-				if ((GetStartTime() >= 13 * MINUTE * IN_MILLISECONDS) &&
-					(GetStartTime() <= 13.1 * MINUTE * IN_MILLISECONDS))
-				{
-					if (demAura->GetStackAmount() == 3)
+					if (GetStartTime() >= 13 * MINUTE * IN_MILLISECONDS)
 					{
-						player->AddAura(41406, player);
-						player->GetSession()->SendAreaTriggerMessage("Damage and healing is slightly increased!");
+						if (demAura->GetStackAmount() == 3)
+						{
+							player->AddAura(SPELL_DEMENTIA, player);
+							player->GetSession()->SendAreaTriggerMessage("Damage and healing is slightly increased!");
+						}
 					}
-				}
 
-				if ((GetStartTime() >= 14 * MINUTE * IN_MILLISECONDS) &&
-					(GetStartTime() <= 14.1 * MINUTE * IN_MILLISECONDS))
-				{
-					if (demAura->GetStackAmount() == 4)
+					if (GetStartTime() >= 14 * MINUTE * IN_MILLISECONDS)
 					{
-						player->AddAura(41406, player);
-						player->GetSession()->SendAreaTriggerMessage("Damage and healing is increased! This is the last tick of anti-draw system, "
-							"which means damage and healing won't be increased anymore!");
+						if (demAura->GetStackAmount() == 4)
+						{
+							player->AddAura(SPELL_DEMENTIA, player);
+							player->GetSession()->SendAreaTriggerMessage("Damage and healing is increased! This is the last tick of anti-draw system, "
+								"which means damage and healing won't be increased anymore!");
+						}
 					}
 				}
 			}

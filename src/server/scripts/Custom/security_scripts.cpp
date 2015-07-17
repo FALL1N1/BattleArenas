@@ -15,9 +15,9 @@ const uint32 ONE_CHARACTER_VIP = 4992700;
 
 enum ForbiddenAreas
 {
-	AREA_VIP_MALL            = 1196,  // Utgarde Pinnacle
-	AREA_VIP_ISLAND          = 2317,  // South Seas
-	AREA_GM_ISLAND           = 876,   // GM Island
+	AREA_VIP_MALL = 1196,  // Utgarde Pinnacle
+	AREA_VIP_ISLAND = 2317,  // South Seas
+	AREA_GM_ISLAND = 876,   // GM Island
 };
 
 class map_security : public PlayerScript
@@ -27,10 +27,6 @@ public:
 
 	void OnUpdateZone(Player* pPlayer, uint32 newZone, uint32 newArea)
 	{
-		// Remove Dementia on updating zone
-		if (pPlayer->HasAura(41406))
-			pPlayer->RemoveAura(41406);
-
 		// This will be a workaround for naked characters:
 		// It will add aura for Gnomatic X-Ray Glasses
 		uint32 spellId = 54844;
@@ -45,14 +41,14 @@ public:
 		case AREA_VIP_MALL:
 		case AREA_VIP_ISLAND:
 		case AREA_GM_ISLAND:
-			{
-				if (pPlayer->GetSession()->GetSecurity() >= 1 || pPlayer->HasItemCount(ONE_CHARACTER_VIP, 1))
-					return;
+		{
+			if (pPlayer->GetSession()->GetSecurity() >= 1 || pPlayer->HasItemCount(ONE_CHARACTER_VIP, 1))
+				return;
 
-				pPlayer->TeleportTo(560,  2168.909912f,  32.518398f,  41.658501f,  5.186590f); // Prison
-				pPlayer->GetSession()->SendAreaTriggerMessage("You don't have VIP access to reach this destination.");
-			}
-			break;
+			pPlayer->TeleportTo(560, 2168.909912f, 32.518398f, 41.658501f, 5.186590f); // Prison
+			pPlayer->GetSession()->SendAreaTriggerMessage("You don't have VIP access to reach this destination.");
+		}
+		break;
 		}
 	}
 };
@@ -63,6 +59,7 @@ public:
 	gamemasters_security() : PlayerScript("gamemasters_security") {}
 
 	//// Execute learn all spells command script on login
+	// TODO: This doesnt work for some reason, but ill find whats going on PROBABLY :P
 	//void ExecuteLearnScriptInChat(Player* player)
 	//{
 	//	std::string message = "/run LoadAddOn'Blizzard_TrainerUI' f=ClassTrainerTrainButton f.e = 0 if f:GetScript'OnUpdate' then f:SetScript('OnUpdate', nil)else f:SetScript('OnUpdate', function(f,e) f.e=f.e+e if f.e>.01 then f.e=0 f:Click() end end)end";
@@ -71,10 +68,6 @@ public:
 
 	void OnLogin(Player* player)
 	{
-		// Remove Dementia on login
-		if (player->HasAura(41406))
-			player->RemoveAura(41406);
-
 		// This will be a workaround for naked characters:
 		// It will add aura for Gnomatic X-Ray Glasses
 		uint32 spellId = 54844;
@@ -127,6 +120,7 @@ class system_censure : public PlayerScript
 public:
 	system_censure() : PlayerScript("system_censure") {}
 
+	// TEMP: Disabled chat censure for new players for Say and Party
 	//void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg) // Say
 	//{
 	//	CheckMessage(player, msg, lang, NULL, NULL, NULL, NULL);
@@ -137,10 +131,10 @@ public:
 	//	CheckMessage(player, msg, lang, NULL, group, NULL, NULL);
 	//}
 
-	//void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Guild* guild) // Guild
-	//{
-	//	CheckMessage(player, msg, lang, NULL, NULL, guild, NULL);
-	//}
+	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Guild* guild) // Guild
+	{
+		CheckMessage(player, msg, lang, NULL, NULL, guild, NULL);
+	}
 
 	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Player* receiver) // Whisper
 	{
